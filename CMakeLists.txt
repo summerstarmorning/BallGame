@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 project(breakout_week2)
 
 add_executable(breakout_week2
-    main.cpp
-    Ball.cpp
-    Paddle.cpp
-    Brick.cpp
+    src/main.cpp
+    src/Ball.cpp
+    src/Paddle.cpp
+    src/Brick.cpp
 )
+
+# --- Include directories for the project ---
+target_include_directories(breakout_week2 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # --- Link raylib located inside the project folder ---
 # The CMAKE_CURRENT_SOURCE_DIR variable refers to the project's root directory.
