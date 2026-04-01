@@ -7,7 +7,7 @@
 int main() {
     const int screenWidth = 800;
     const int screenHeight = 600;
-    InitWindow(screenWidth, screenHeight, "打砖块2D - 第二周");
+    InitWindow(screenWidth, screenHeight, "Breakout Clone - Week 2");
 
     // 创建游戏对象
     Ball ball({400, 300}, {2, 2}, 10);
