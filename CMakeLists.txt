@@ -3,6 +3,7 @@ project(breakout_week2)
 
 add_executable(breakout_week2
     src/main.cpp
+    src/Game.cpp
     src/Ball.cpp
     src/Paddle.cpp
     src/Brick.cpp

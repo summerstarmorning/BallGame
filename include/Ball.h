@@ -26,6 +26,7 @@ public:
     Vector2 GetSpeed() const { return speed; }
     float GetRadius() const { return radius; }
     void SetSpeed(Vector2 s) { speed = s; }
+    void SetPosition(Vector2 p) { position = p; }
 };
 
 #endif

@@ -36,8 +36,6 @@ void Ball::BounceEdge(int screenWidth, int screenHeight) {
     if (position.y < top) {
         position.y = top;
         if (speed.y < 0.0f) speed.y = -speed.y;
-    } else if (position.y > bottom) {
-        position.y = bottom;
-        if (speed.y > 0.0f) speed.y = -speed.y;
     }
+    // 不再处理底部边界，当球掉出屏幕由主逻辑处理生命值丢失
 }
