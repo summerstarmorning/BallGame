@@ -5,51 +5,89 @@
 #include <vector>
 
 int main() {
-    const int screenWidth = 800;
-    const int screenHeight = 600;
-    InitWindow(screenWidth, screenHeight, "Breakout Clone - Week 2");
+int screenWidth = 800;
+int screenHeight = 600;
+InitWindow(screenWidth, screenHeight, "Break all the bricks with the ball");
 
-    // 创建游戏对象
-    Ball ball({400, 300}, {2, 2}, 10);
-    Paddle paddle(350, 550, 100, 20);
+Ball ball({400.0f, 300.0f}, {2.0f, 2.0f}, 10.0f);
+Paddle paddle(350.0f, 550.0f, 100.0f, 20.0f);
 
-    // 创建砖块（示例：一排5个）
-    std::vector<Brick> bricks;
-    float brickWidth = 100;
-    float brickHeight = 30;
-    for (int i = 0; i < 8; i++) {
-        bricks.emplace_back(50 + i * 120, 100, brickWidth, brickHeight);
-    }
+std::vector<Brick> bricks;
+float brickWidth = 100.0f;
+float brickHeight = 30.0f;
 
-    // 绘制左右墙为灰色矩形
-    DrawRectangle(0, 0, 5, screenHeight, GRAY);   // 左墙宽5像素
-    DrawRectangle(screenWidth-5, 0, 5, screenHeight, GRAY); // 右墙
-    // 绘制天花板和地板
-    DrawRectangle(0, 0, screenWidth, 5, GRAY);    // 顶墙高5像素
-    DrawRectangle(0, screenHeight-5, screenWidth, 5, GRAY); // 底墙
+for (int i = 0; i < 8; i++) {
+bricks.emplace_back(50.0f + i * 120.0f, 100.0f, brickWidth, brickHeight);
+}
 
-    SetTargetFPS(60);
+SetTargetFPS(60);
 
-    while (!WindowShouldClose()) {
-        // 更新
-        ball.Move();
-        ball.BounceEdge(screenWidth, screenHeight);
+bool exitWindowRequest = false;
 
-        // 板移动
-        if (IsKeyDown(KEY_LEFT)) paddle.MoveLeft(5);
-        if (IsKeyDown(KEY_RIGHT)) paddle.MoveRight(5);
+while (!exitWindowRequest && !WindowShouldClose()) {
+if (IsKeyPressed(KEY_Q)) {
+exitWindowRequest = true;
+}
 
-        // 绘制
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
+ball.Move();
+ball.BounceEdge(screenWidth, screenHeight);
 
-        ball.Draw();
-        paddle.Draw();
-        for (auto& brick : bricks) brick.Draw();
+if (CheckCollisionCircleRec(ball.GetPosition(), ball.GetRadius(), paddle.GetRect())) {
+Vector2 speed = ball.GetSpeed();
+if (speed.y > 0) {
+speed.y = -speed.y;
+float paddleCenter = paddle.GetRect().x + paddle.GetRect().width / 2.0f;
+float hitOffset = ball.GetPosition().x - paddleCenter;
+speed.x += hitOffset * 0.05f; 
+ball.SetSpeed(speed);
+}
+}
 
-        EndDrawing();
-    }
+for (auto& brick : bricks) {
+if (brick.IsActive() && CheckCollisionCircleRec(ball.GetPosition(), ball.GetRadius(), brick.GetRect())) {
+brick.SetActive(false);
 
-    CloseWindow();
-    return 0;
+Vector2 speed = ball.GetSpeed();
+Vector2 pos = ball.GetPosition();
+Rectangle rect = brick.GetRect();
+
+bool hitSide = (pos.x < rect.x) || (pos.x > rect.x + rect.width);
+bool hitTopBottom = (pos.y < rect.y) || (pos.y > rect.y + rect.height);
+
+if (hitSide && !hitTopBottom) {
+speed.x = -speed.x;
+} else if (!hitSide && hitTopBottom) {
+speed.y = -speed.y;
+} else {
+speed.x = -speed.x;
+speed.y = -speed.y;
+}
+
+ball.SetSpeed(speed);
+break;
+}
+}
+
+if (IsKeyDown(KEY_LEFT)) paddle.MoveLeft(5.0f);
+if (IsKeyDown(KEY_RIGHT)) paddle.MoveRight(5.0f);
+
+BeginDrawing();
+ClearBackground(RAYWHITE);
+
+DrawRectangle(0, 0, 5, screenHeight, GRAY);
+DrawRectangle(screenWidth - 5, 0, 5, screenHeight, GRAY);
+DrawRectangle(0, 0, screenWidth, 5, GRAY);
+DrawRectangle(0, screenHeight - 5, screenWidth, 5, GRAY);
+
+ball.Draw();
+paddle.Draw();
+for (auto& brick : bricks) {
+brick.Draw();
+}
+
+EndDrawing();
+}
+
+CloseWindow();
+return 0;
 }
