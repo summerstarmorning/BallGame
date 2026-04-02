@@ -69,13 +69,17 @@
 ## 文件结构
 
 ```
-.
-├── Ball.cpp            # 小球类的实现
-├── Ball.h              # 小球类的头文件
-├── Brick.cpp           # 砖块类的实现
-├── Brick.h             # 砖块类的头文件
-├── Paddle.cpp          # 挡板类的实现
-├── Paddle.h            # 挡板类的头文件
-├── main.cpp            # 程序主入口和游戏循环
-└── CMakeLists.txt      # CMake 构建配置文件
-```
+BallGame/
+├── CMakeLists.txt
+├── README.md
+├── build/         (...)
+├── include/       (放头文件 .h)
+│   ├── Ball.h
+│   ├── Brick.h
+│   └── Paddle.h
+├── raylib/        (...)
+└── src/           (放源代码 .cpp)
+    ├── Ball.cpp
+    ├── Brick.cpp
+    ├── Paddle.cpp
+    └── main.cpp
