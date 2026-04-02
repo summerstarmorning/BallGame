@@ -19,6 +19,8 @@ public:
     void Draw();
     bool IsActive() const { return active; }
     void SetActive(bool a) { active = a; }
+    
+    Rectangle GetRect() const { return rect; }
 };
 
-#endif
+#endif#endif

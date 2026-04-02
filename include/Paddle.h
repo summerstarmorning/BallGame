@@ -15,6 +15,8 @@ public:
     void Draw();
     void MoveLeft(float speed);
     void MoveRight(float speed);
+    
+    Rectangle GetRect() const { return rect; }
 };
 
-#endif
+#endif#endif

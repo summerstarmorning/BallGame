@@ -21,6 +21,11 @@ public:
     void Move();
     void Draw();
     void BounceEdge(int screenWidth, int screenHeight);
+
+    Vector2 GetPosition() const { return position; }
+    Vector2 GetSpeed() const { return speed; }
+    float GetRadius() const { return radius; }
+    void SetSpeed(Vector2 s) { speed = s; }
 };
 
-#endif
+#endif#endif 

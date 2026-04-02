@@ -16,7 +16,7 @@ void Paddle::MoveLeft(float speed) {
     // 像素墙设定
     if (rect.x < 5.0f) rect.x = 5.0f;
 }
-
+//往右移动
 void Paddle::MoveRight(float speed) {
     rect.x += speed;
     
