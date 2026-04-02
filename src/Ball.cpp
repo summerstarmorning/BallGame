@@ -1,29 +1,30 @@
 ﻿#include "Ball.h"
 
-//构造(位置,速度，半径)
+// 构造函数 (位置, 速度, 半径)
 Ball::Ball(Vector2 pos, Vector2 sp, float r)
     : position(pos), speed(sp), radius(r) {}
 
-//pos(t+dt)=pos(t)+vdt
+// 更新位置: pos(t+dt) = pos(t) + v * dt
 void Ball::Move() {
     position.x += speed.x;
     position.y += speed.y;
 }
-//渲染
+
+// 渲染小球
 void Ball::Draw() {
     DrawCircleV(position, radius, RED);
 }
-//边缘碰撞
-//传入屏幕宽高
+
+// 边缘碰撞检测与响应
+// 参数: 屏幕宽高
 void Ball::BounceEdge(int screenWidth, int screenHeight) {
-    //圆心坐标有效边界
+    // 圆心允许的有效边界
     const float left = radius;
     const float right = static_cast<float>(screenWidth) - radius;
     const float top = radius;
     const float bottom = static_cast<float>(screenHeight) - radius;
-	//碰撞检测
-    //会有一个一顿一顿的位置纠正以及速度瞬间反向
-    //x,y正交线性处理
+
+    // 碰撞检测及速度修正
     if (position.x < left) {
         position.x = left;
         if (speed.x < 0.0f) speed.x = -speed.x;

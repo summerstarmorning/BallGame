@@ -1,12 +1,12 @@
 ﻿#include "Brick.h"
-//构造
-//形状：左上角坐标与宽高
-//存活状态：True
+
+// 构造：矩形位置和大小，初始为激活状态
 Brick::Brick(float x, float y, float w, float h) {
     rect = { x, y, w, h };
     active = true;
 }
-//渲染
+
+// 渲染：仅渲染处于激活状态的砖块
 void Brick::Draw() {
     if (active) {
         DrawRectangleRec(rect, GREEN);

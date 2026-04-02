@@ -28,4 +28,4 @@ public:
     void SetSpeed(Vector2 s) { speed = s; }
 };
 
-#endif#endif 
+#endif

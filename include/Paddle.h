@@ -19,4 +19,4 @@ public:
     Rectangle GetRect() const { return rect; }
 };
 
-#endif#endif
+#endif
