@@ -9,16 +9,16 @@
     "ball": {
         "startX": 512.0,
         "startY": 384.0,
-        "speedX": 6.0,
-        "speedY": 6.0,
+        "speedX": 8.0,
+        "speedY": 8.0,
         "radius": 15.0
     },
 
     "paddle": {
         "startX": 437.0,
         "startY": 700.0,
-        "width": 150.0,
+        "width": 120.0,
         "height": 25.0,
-        "speed": 7.0
+        "speed": 8.0
     }
 }

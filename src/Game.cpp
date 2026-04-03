@@ -15,7 +15,8 @@ Game::Game(int width, int height)
       ball({(float)width / 2.0f, (float)height / 2.0f}, {4.0f, 4.0f}, 15.0f),
       paddle((float)width / 2.0f - 75.0f, (float)height - 68.0f, 150.0f, 25.0f),
       lives(3), score(0), currentState(GameState::MENU), victory(false), exitWindowRequest(false),
-      isDarkMode(false), ballColorIndex(0), paddleColorIndex(0), brickColorIndex(0)
+      isDarkMode(false), debugMode(false), ballColorIndex(0), paddleColorIndex(0), brickColorIndex(0),
+      currentLevel(1)
 {
     // 定义可选的颜色
     Color colors[] = {RED, BLUE, GREEN, ORANGE, PURPLE, MAROON, DARKBLUE, DARKGREEN};
@@ -23,7 +24,13 @@ Game::Game(int width, int height)
     paddleColor = colors[paddleColorIndex + 1];
     brickColor = colors[brickColorIndex + 2];
 
-    std::ifstream f("config.json");
+    InitConfigAndBricks(currentLevel == 1 ? "config.json" : "config2.json");
+    prevPaddleX = paddle.GetRect().x;
+}
+
+void Game::InitConfigAndBricks(const std::string& levelJsonFile) {
+    bricks.clear();
+    std::ifstream f(levelJsonFile);
     if (f.is_open()) {
         try {
             // 参数四为 true 允许解析注释
@@ -50,11 +57,13 @@ Game::Game(int width, int height)
         } catch (json::parse_error& e) {
             std::cerr << "JSON Parse Error: " << e.what() << std::endl;
         }
+    } else {
+        std::cerr << "Could not open level config file: " << levelJsonFile << std::endl;
     }
 
     InitBricks();
-    prevPaddleX = paddle.GetRect().x;
 }
+
 // 私有方法：初始化砖块
 void Game::InitBricks() {
     float brickWidth = 120.0f;
@@ -73,6 +82,10 @@ void Game::HandleInput() {
     Vector2 mousePos = GetMousePosition();
     if (IsKeyPressed(KEY_Q)) {
         exitWindowRequest = true;
+    }
+
+    if (IsKeyPressed(KEY_F1)) {
+        debugMode = !debugMode;
     }
 
     if (currentState == GameState::MENU) {
@@ -143,8 +156,11 @@ void Game::Update() {
 // 渲染：清屏、绘制实体、UI、结束绘制
 void Game::CheckBottomCollision() {
     if (ball.GetPosition().y + ball.GetRadius() >= screenHeight) {
-        lives--;
-        if (lives <= 0) {
+        if (!debugMode) {
+            lives--;
+        }
+        
+        if (lives <= 0 && !debugMode) {
             currentState = GameState::GAMEOVER;
         } else {
             ball.SetPosition({ screenWidth / 2.0f, screenHeight / 2.0f }); // 发球点居中
@@ -176,37 +192,31 @@ void Game::HandleBrickCollision() {
         if (!brick.IsActive()) continue;
         
         activeBricksCount++;
-        if (CheckCollisionCircleRec(ball.GetPosition(), ball.GetRadius(), brick.GetRect())) {
+        if (ball.CheckBrickCollision(brick.GetRect())) {
             brick.SetActive(false);
             score += 100;
             activeBricksCount--;
-
-            Vector2 speed = ball.GetSpeed();
-            Vector2 pos = ball.GetPosition();
-            Rectangle rect = brick.GetRect();
-
-            bool hitSide = (pos.x < rect.x) || (pos.x > rect.x + rect.width);
-            bool hitTopBottom = (pos.y < rect.y) || (pos.y > rect.y + rect.height);
-
-            if (hitSide && !hitTopBottom) speed.x = -speed.x;
-            else if (!hitSide && hitTopBottom) speed.y = -speed.y;
-            else { speed.x = -speed.x; speed.y = -speed.y; }
-
-            ball.SetSpeed(speed);
             break; // 每次只处理一次砖块碰撞
         }
     }
 
     if (activeBricksCount == 0) {
-        victory = true;
+        // 多关卡支持逻辑：
+        if (currentLevel == 1) {
+            currentLevel = 2;
+            InitConfigAndBricks("config2.json"); // 进入下一关
+        } else {
+            victory = true;
+        }
     }
 }
 
 void Game::Draw() {
     BeginDrawing();
     
-    // 渲染背景
-    ClearBackground(isDarkMode ? BLACK : RAYWHITE);
+    // 渲染背景 - 深色模式不要全黑，采用淡灰，带一定透明度
+    Color darkBackground = { 40, 40, 45, 255 };
+    ClearBackground(isDarkMode ? darkBackground : RAYWHITE);
     Color textColor = isDarkMode ? LIGHTGRAY : DARKGRAY;
     Color borderColor = isDarkMode ? DARKGRAY : GRAY;
 
@@ -215,9 +225,12 @@ void Game::Draw() {
     DrawRectangle(screenWidth - 5, 0, 5, screenHeight, borderColor);
     DrawRectangle(0, 0, screenWidth, 5, borderColor);
 
-    // UI部分
+        // UI部分
     DrawText(TextFormat("SCORE: %d", score), 20, 20, 20, textColor);
-    DrawText(TextFormat("LIVES: %d", lives), screenWidth - 180, 20, 20, MAROON); // 移至左侧避开暂停按钮
+    DrawText(TextFormat("LIVES: %d", debugMode ? 999 : lives), screenWidth - 180, 20, 20, debugMode ? GREEN : MAROON); // 移至左侧避开暂停按钮
+    if (debugMode) {
+        DrawText("[DEBUG: INVINCIBLE]", screenWidth / 2 - 100, 20, 20, GREEN);
+    }
 
     // 暂停/继续按钮图形绘制
     Rectangle btnRec = { screenWidth - 60.0f, 10.0f, 40.0f, 40.0f };

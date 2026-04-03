@@ -26,6 +26,10 @@ target_link_libraries(breakout_week2 PUBLIC raylib.lib winmm.lib)
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
+
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config2.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config2.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config2.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
 # --- Simple test target for collision logic ---
 add_executable(test_collision
     src/tests/test_collision.cpp

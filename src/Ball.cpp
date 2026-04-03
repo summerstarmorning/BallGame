@@ -39,3 +39,17 @@ void Ball::BounceEdge(int screenWidth, int screenHeight) {
     }
     // 不再处理底部边界，当球掉出屏幕由主逻辑处理生命值丢失
 }
+
+bool Ball::CheckBrickCollision(Rectangle rect) {
+    if (CheckCollisionCircleRec(position, radius, rect)) {
+        bool hitSide = (position.x < rect.x) || (position.x > rect.x + rect.width);
+        bool hitTopBottom = (position.y < rect.y) || (position.y > rect.y + rect.height);
+
+        if (hitSide && !hitTopBottom) speed.x = -speed.x;
+        else if (!hitSide && hitTopBottom) speed.y = -speed.y;
+        else { speed.x = -speed.x; speed.y = -speed.y; }
+
+        return true;
+    }
+    return false;
+}

@@ -21,6 +21,7 @@ public:
     void Move();
     void Draw(Color c = RED);
     void BounceEdge(int screenWidth, int screenHeight);
+    bool CheckBrickCollision(Rectangle brickRect);
 
     Vector2 GetPosition() const { return position; }
     Vector2 GetSpeed() const { return speed; }
