@@ -19,7 +19,8 @@ Game::Game(int width, int height)
     std::ifstream f("config.json");
     if (f.is_open()) {
         try {
-            json data = json::parse(f);
+            // 参数四为 true 允许解析注释
+            json data = json::parse(f, nullptr, true, true);
             
             if (data.contains("game")) {
                 lives = data["game"].value("lives", 3);
@@ -69,13 +70,26 @@ void Game::HandleInput() {
     if (currentState == GameState::MENU) {
         if (IsKeyPressed(KEY_ENTER)) currentState = GameState::PLAYING;
     } else if (currentState == GameState::PLAYING) {
+        Vector2 mousePos = GetMousePosition();
+        Rectangle pauseBtn = { screenWidth - 60.0f, 10.0f, 40.0f, 40.0f }; // 右上角暂停按钮区域
+
         if (IsKeyPressed(KEY_P)) currentState = GameState::PAUSED;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mousePos, pauseBtn)) {
+            currentState = GameState::PAUSED;
+        }
+
         if (!victory) {
             if (IsKeyDown(KEY_LEFT)) paddle.MoveLeft(5.0f);
             if (IsKeyDown(KEY_RIGHT)) paddle.MoveRight(5.0f);
         }
     } else if (currentState == GameState::PAUSED) {
+        Vector2 mousePos = GetMousePosition();
+        Rectangle resumeBtn = { screenWidth - 60.0f, 10.0f, 40.0f, 40.0f }; // 右上角暂停按钮区域
+
         if (IsKeyPressed(KEY_P)) currentState = GameState::PLAYING;
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mousePos, resumeBtn)) {
+            currentState = GameState::PLAYING;
+        }
     } else if (currentState == GameState::GAMEOVER) {
         if (IsKeyPressed(KEY_ENTER)) {
             // Restart game logic can be complex, let's just allow quit for now
@@ -118,12 +132,9 @@ void Game::HandlePaddleCollision(float paddleVel) {
         Vector2 speed = ball.GetSpeed();
         if (speed.y > 0) {
             speed.y = -std::abs(speed.y); // 防止卡弹反转
-            // 根据球相对于挡板中心的偏移调整水平速度
-            float paddleCenter = paddle.GetRect().x + paddle.GetRect().width / 2.0f;
-            float normalized = (ball.GetPosition().x - paddleCenter) / (paddle.GetRect().width / 2.0f);
-            // HIT_OFFSET_FACTOR 控制偏移对速度的影响程度
-            // PADDLE_INFLUENCE 控制挡板移动对速度的影响
-            speed.x += normalized * HIT_OFFSET_FACTOR + paddleVel * PADDLE_INFLUENCE;
+            // 移除了依赖不同击球位置产生不同速度的设定
+            // PADDLE_INFLUENCE 控制挡板移动对速度的影响（切向速度保留）
+            speed.x += paddleVel * PADDLE_INFLUENCE;
             // 限制最大水平速度，防止过快导致难以控制
             if (speed.x > MAX_H_SPEED) speed.x = MAX_H_SPEED;
             if (speed.x < -MAX_H_SPEED) speed.x = -MAX_H_SPEED;
@@ -176,7 +187,23 @@ void Game::Draw() {
 
     // UI部分
     DrawText(TextFormat("SCORE: %d", score), 20, 20, 20, DARKGRAY);
-    DrawText(TextFormat("LIVES: %d", lives), screenWidth - 120, 20, 20, MAROON);
+    DrawText(TextFormat("LIVES: %d", lives), screenWidth - 180, 20, 20, MAROON); // 移至左侧避开暂停按钮
+
+    // 暂停/继续按钮图形绘制
+    Rectangle btnRec = { screenWidth - 60.0f, 10.0f, 40.0f, 40.0f };
+    DrawRectangleRec(btnRec, LIGHTGRAY);
+    DrawRectangleLinesEx(btnRec, 2, DARKGRAY);
+    if (currentState == GameState::PLAYING) {
+        // 画暂停图标 (||)
+        DrawRectangle(btnRec.x + 12, btnRec.y + 10, 6, 20, DARKGRAY);
+        DrawRectangle(btnRec.x + 22, btnRec.y + 10, 6, 20, DARKGRAY);
+    } else {
+        // 画播放图标 (三角形)
+        Vector2 p1 = { btnRec.x + 14, btnRec.y + 10 };
+        Vector2 p2 = { btnRec.x + 14, btnRec.y + 30 };
+        Vector2 p3 = { btnRec.x + 32, btnRec.y + 20 };
+        DrawTriangle(p1, p2, p3, DARKGRAY);
+    }
 
     if (currentState == GameState::MENU) {
         DrawText("BRICK BREAKER", screenWidth / 2 - 130, screenHeight / 2 - 50, 40, DARKBLUE);
