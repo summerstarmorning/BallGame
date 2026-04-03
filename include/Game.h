@@ -81,6 +81,11 @@ private:
      */
     void HandleBrickCollision();
 
+    /**
+     * @brief 初始化砖块
+     */
+    void InitBricks();
+
 public:
     /**
      * @brief Game 类的构造函数，初始化游戏窗口相关及启动主菜单
@@ -108,3 +113,6 @@ public:
     /**
      * @brief 对全游戏场景和UI进行当帧画面的渲染
      */
+    void Draw();
+
+};

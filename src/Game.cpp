@@ -15,14 +15,26 @@ Game::Game(int width, int height)
       ball({(float)width / 2.0f, (float)height / 2.0f}, {4.0f, 4.0f}, 15.0f),
       paddle((float)width / 2.0f - 75.0f, (float)height - 68.0f, 150.0f, 25.0f),
       lives(3), score(0), currentState(GameState::MENU), victory(false), exitWindowRequest(false),
-      isDarkMode(false), debugMode(false), ballColorIndex(0), paddleColorIndex(0), brickColorIndex(0),
+      isDarkMode(false), debugMode(false), ballColorIndex(0), paddleColorIndex(1), brickColorIndex(2),
       currentLevel(1)
 {
+    // 尝试读取 user_prefs.json 恢复配置
+    std::ifstream prefsFile("user_prefs.json");
+    if (prefsFile.is_open()) {
+        try {
+            json prefs = json::parse(prefsFile);
+            isDarkMode = prefs.value("isDarkMode", false);
+            ballColorIndex = prefs.value("ballColorIndex", 0);
+            paddleColorIndex = prefs.value("paddleColorIndex", 1);
+            brickColorIndex = prefs.value("brickColorIndex", 2);
+        } catch (...) {}
+    }
+
     // 定义可选的颜色
     Color colors[] = {RED, BLUE, GREEN, ORANGE, PURPLE, MAROON, DARKBLUE, DARKGREEN};
-    ballColor = colors[ballColorIndex];
-    paddleColor = colors[paddleColorIndex + 1];
-    brickColor = colors[brickColorIndex + 2];
+    ballColor = colors[ballColorIndex % 8];
+    paddleColor = colors[paddleColorIndex % 8];
+    brickColor = colors[brickColorIndex % 8];
 
     InitConfigAndBricks(currentLevel == 1 ? "config.json" : "config2.json");
     prevPaddleX = paddle.GetRect().x;
@@ -66,11 +78,23 @@ void Game::InitConfigAndBricks(const std::string& levelJsonFile) {
 
 // 私有方法：初始化砖块
 void Game::InitBricks() {
-    float brickWidth = 120.0f;
-    float brickHeight = 40.0f;
-    for (int i = 0; i < 8; i++) {
-        // 放大砖块体积(120*40)，横向占更宽
-        bricks.emplace_back(30.0f + i * 122.0f, 120.0f, brickWidth, brickHeight);
+    int rows = 4;
+    int cols = 8;
+    float brickWidth = 100.0f;
+    float brickHeight = 30.0f;
+    float gapX = 20.0f;
+    float gapY = 20.0f;
+    
+    // 居中计算起始 X 坐标
+    float startX = (screenWidth - (cols * brickWidth + (cols - 1) * gapX)) / 2.0f;
+    float startY = 100.0f;
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            float x = startX + j * (brickWidth + gapX);
+            float y = startY + i * (brickHeight + gapY);
+            bricks.emplace_back(x, y, brickWidth, brickHeight);
+        }
     }
 }
 // 是否请求关闭窗口
@@ -84,7 +108,7 @@ void Game::HandleInput() {
         exitWindowRequest = true;
     }
 
-    if (IsKeyPressed(KEY_F1)) {
+    if (IsKeyPressed(KEY_Z)) {
         debugMode = !debugMode;
     }
 
@@ -108,7 +132,19 @@ void Game::HandleInput() {
         paddleColor = colors[paddleColorIndex];
         brickColor = colors[brickColorIndex];
 
-        if (IsKeyPressed(KEY_ENTER)) currentState = GameState::PLAYING;
+        if (IsKeyPressed(KEY_ENTER)) {
+            currentState = GameState::PLAYING;
+            // 保存用户配置到 user_prefs.json
+            json prefs;
+            prefs["isDarkMode"] = isDarkMode;
+            prefs["ballColorIndex"] = ballColorIndex;
+            prefs["paddleColorIndex"] = paddleColorIndex;
+            prefs["brickColorIndex"] = brickColorIndex;
+            std::ofstream out("user_prefs.json");
+            if (out.is_open()) {
+                out << prefs.dump(4);
+            }
+        }
     } else if (currentState == GameState::PLAYING) {
         Rectangle pauseBtn = { screenWidth - 60.0f, 10.0f, 40.0f, 40.0f }; // 右上角暂停按钮区域
 
@@ -248,6 +284,15 @@ void Game::Draw() {
         DrawTriangle(p1, p2, p3, textColor);
     }
 
+    if (currentState == GameState::PLAYING || currentState == GameState::PAUSED || currentState == GameState::GAMEOVER || victory) {
+        // 实体
+        ball.Draw(ballColor);
+        paddle.Draw(paddleColor);
+        for (auto& brick : bricks) {
+            brick.Draw(brickColor);
+        }
+    }
+
     if (currentState == GameState::MENU) {
         DrawText("BRICK BREAKER", screenWidth / 2 - 130, screenHeight / 2 - 120, 40, isDarkMode ? RAYWHITE : DARKBLUE);
         DrawText("Press ENTER to Start", screenWidth / 2 - 100, screenHeight / 2 - 60, 20, textColor);
@@ -280,13 +325,6 @@ void Game::Draw() {
         DrawText("YOU WIN!", screenWidth / 2 - 100, screenHeight / 2, 40, GREEN);
         DrawText(TextFormat("FINAL SCORE: %d", score), screenWidth / 2 - 120, screenHeight / 2 + 50, 20, textColor);
         DrawText("Press Q to Quit", screenWidth / 2 - 120, screenHeight / 2 + 80, 20, textColor);
-    } else {
-        // 实体
-        ball.Draw(ballColor);
-        paddle.Draw(paddleColor);
-        for (auto& brick : bricks) {
-            brick.Draw(brickColor);
-        }
     }
 
     EndDrawing();
