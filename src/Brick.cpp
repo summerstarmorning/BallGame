@@ -7,8 +7,9 @@ Brick::Brick(float x, float y, float w, float h) {
 }
 
 // 渲染：仅渲染处于激活状态的砖块
-void Brick::Draw() {
+void Brick::Draw(Color c) {
     if (active) {
-        DrawRectangleRec(rect, GREEN);
+        DrawRectangleRounded(rect, 0.2f, 4, c);
+        DrawRectangleRoundedLines(rect, 0.2f, 4, 2.0f, ColorAlpha(BLACK, 0.2f));
     }
 }

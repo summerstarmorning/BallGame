@@ -6,8 +6,8 @@ Paddle::Paddle(float x, float y, float w, float h) {
 }
 
 // 渲染挡板
-void Paddle::Draw() {
-    DrawRectangleRec(rect, BLUE);
+void Paddle::Draw(Color c) {
+    DrawRectangleRounded(rect, 0.5f, 4, c);
 }
 
 // 往左移动，每帧移动量由 speed 指定

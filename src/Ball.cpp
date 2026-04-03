@@ -11,8 +11,8 @@ void Ball::Move() {
 }
 
 // 渲染小球
-void Ball::Draw() {
-    DrawCircleV(position, radius, RED);
+void Ball::Draw(Color c) {
+    DrawCircleV(position, radius, c);
 }
 
 // 边缘碰撞检测与响应

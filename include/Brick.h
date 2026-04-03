@@ -16,7 +16,7 @@ private:
 // 设置存活状态
 public:
     Brick(float x, float y, float w, float h);
-    void Draw();
+    void Draw(Color c = GREEN);
     bool IsActive() const { return active; }
     void SetActive(bool a) { active = a; }
     

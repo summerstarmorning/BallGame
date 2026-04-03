@@ -23,6 +23,18 @@ private:
     GameState currentState;
     bool victory;
     bool exitWindowRequest;
+    
+    // UI 和主题设定
+    bool isDarkMode;
+    Color ballColor;
+    Color paddleColor;
+    Color brickColor;
+
+    // 颜色库索引
+    int ballColorIndex;
+    int paddleColorIndex;
+    int brickColorIndex;
+    
     //碰撞参数
     //碰撞偏移量、挡板影响力、最大水平速度、上一帧挡板位置
     const float HIT_OFFSET_FACTOR = 4.0f;    // 减弱边缘击球带来的增速幅度

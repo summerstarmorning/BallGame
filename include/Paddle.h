@@ -12,7 +12,7 @@ private:
 // 移动
 public:
     Paddle(float x, float y, float w, float h);
-    void Draw();
+    void Draw(Color c = BLUE);
     void MoveLeft(float speed);
     void MoveRight(float speed);
     

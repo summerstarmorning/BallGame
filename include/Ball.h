@@ -19,7 +19,7 @@ private:
 public:
     Ball(Vector2 pos, Vector2 sp, float r);
     void Move();
-    void Draw();
+    void Draw(Color c = RED);
     void BounceEdge(int screenWidth, int screenHeight);
 
     Vector2 GetPosition() const { return position; }

@@ -1,24 +1,24 @@
 {
-    // 游戏基础设置
+    
     "game": {
-        "screenWidth": 1024, // 屏幕宽度
-        "screenHeight": 768, // 屏幕高度
-        "lives": 3           // 初始生命值
+        "screenWidth": 1024, 
+        "screenHeight": 768, 
+        "lives": 3           
     },
-    // 小球参数
+    
     "ball": {
-        "startX": 512.0, // 初始X坐标
-        "startY": 384.0, // 初始Y坐标
-        "speedX": 4.0,   // 初始水平速度
-        "speedY": 4.0,   // 初始垂直速度
-        "radius": 15.0   // 小球半径
+        "startX": 512.0, 
+        "startY": 384.0, 
+        "speedX": 4.0,   
+        "speedY": 4.0,   
+        "radius": 15.0   
     },
-    // 挡板参数
+    
     "paddle": {
-        "startX": 437.0, // 初始X坐标
-        "startY": 700.0, // 初始Y坐标
-        "width": 150.0,  // 挡板宽度
-        "height": 25.0,  // 挡板高度
-        "speed": 5.0     // 挡板移动速度
+        "startX": 437.0, 
+        "startY": 700.0, 
+        "width": 150.0,  
+        "height": 25.0,  
+        "speed": 5.0     
     }
 }
