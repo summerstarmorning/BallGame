@@ -118,12 +118,25 @@ void Game::HandleInput() {
         Rectangle ballBtn = { screenWidth / 2.0f - 100, screenHeight / 2.0f + 110, 200, 40 };
         Rectangle paddleBtn = { screenWidth / 2.0f - 100, screenHeight / 2.0f + 160, 200, 40 };
         Rectangle brickBtn = { screenWidth / 2.0f - 100, screenHeight / 2.0f + 210, 200, 40 };
+
+        // 关卡选择按钮
+        Rectangle level1Btn = { screenWidth / 2.0f + 130, screenHeight / 2.0f + 60, 100, 40 };
+        Rectangle level2Btn = { screenWidth / 2.0f + 130, screenHeight / 2.0f + 110, 100, 40 };
         
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             if (CheckCollisionPointRec(mousePos, themeBtn)) isDarkMode = !isDarkMode;
             if (CheckCollisionPointRec(mousePos, ballBtn)) ballColorIndex = (ballColorIndex + 1) % 8;
             if (CheckCollisionPointRec(mousePos, paddleBtn)) paddleColorIndex = (paddleColorIndex + 1) % 8;
             if (CheckCollisionPointRec(mousePos, brickBtn)) brickColorIndex = (brickColorIndex + 1) % 8;
+            
+            if (CheckCollisionPointRec(mousePos, level1Btn)) {
+                currentLevel = 1;
+                InitConfigAndBricks("config.json");
+            }
+            if (CheckCollisionPointRec(mousePos, level2Btn)) {
+                currentLevel = 2;
+                InitConfigAndBricks("config2.json");
+            }
         }
 
         // Color Palette
@@ -314,6 +327,16 @@ void Game::Draw() {
 
         DrawRectangleRounded(brickBtn, 0.2f, 4, brickColor);
         DrawText("Brick Color", (int)(brickBtn.x + 45), (int)(brickBtn.y + 10), 20, WHITE);
+
+        // 关卡选择UI
+        Rectangle level1Btn = { screenWidth / 2.0f + 130, screenHeight / 2.0f + 60, 100, 40 };
+        Rectangle level2Btn = { screenWidth / 2.0f + 130, screenHeight / 2.0f + 110, 100, 40 };
+        
+        DrawRectangleRounded(level1Btn, 0.2f, 4, currentLevel == 1 ? DARKGREEN : (isDarkMode ? LIGHTGRAY : GRAY));
+        DrawText("Level 1", (int)(level1Btn.x + 15), (int)(level1Btn.y + 10), 20, currentLevel == 1 ? WHITE : (isDarkMode ? BLACK : WHITE));
+        
+        DrawRectangleRounded(level2Btn, 0.2f, 4, currentLevel == 2 ? DARKGREEN : (isDarkMode ? LIGHTGRAY : GRAY));
+        DrawText("Level 2", (int)(level2Btn.x + 15), (int)(level2Btn.y + 10), 20, currentLevel == 2 ? WHITE : (isDarkMode ? BLACK : WHITE));
 
     } else if (currentState == GameState::PAUSED) {
         DrawText("PAUSED", screenWidth / 2 - 70, screenHeight / 2, 40, ORANGE);
