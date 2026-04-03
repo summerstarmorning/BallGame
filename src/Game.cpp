@@ -1,15 +1,49 @@
 #include "Game.h"
 #include <cmath>
+#include <iostream>
+#include <fstream>
+#include "nlohmann_json.hpp"
+
+using json = nlohmann::json;
+
 // 构造函数：初始化屏幕大小
 // 球位置和速度
 // 挡板位置
 // 生命值、分数、游戏状态等
 Game::Game(int width, int height)
     : screenWidth(width), screenHeight(height),
-      ball({512.0f, 384.0f}, {4.0f, 4.0f}, 15.0f),       // 增大球（半径由10调整为15）及初始速度调整
-      paddle(437.0f, 700.0f, 150.0f, 25.0f),             // 挡板变宽(100->150)变厚，位置调整以适应大屏
-      lives(3), score(0), gameRunning(true), victory(false), exitWindowRequest(false)
+      ball({512.0f, 384.0f}, {4.0f, 4.0f}, 15.0f),
+      paddle(437.0f, 700.0f, 150.0f, 25.0f),
+      lives(3), score(0), currentState(GameState::MENU), victory(false), exitWindowRequest(false)
 {
+    std::ifstream f("config.json");
+    if (f.is_open()) {
+        try {
+            json data = json::parse(f);
+            
+            if (data.contains("game")) {
+                lives = data["game"].value("lives", 3);
+            }
+            if (data.contains("ball")) {
+                ball = Ball(
+                    {data["ball"].value("startX", 512.0f), data["ball"].value("startY", 384.0f)},
+                    {data["ball"].value("speedX", 4.0f), data["ball"].value("speedY", 4.0f)},
+                    data["ball"].value("radius", 15.0f)
+                );
+            }
+            if (data.contains("paddle")) {
+                paddle = Paddle(
+                    data["paddle"].value("startX", 437.0f),
+                    data["paddle"].value("startY", 700.0f),
+                    data["paddle"].value("width", 150.0f),
+                    data["paddle"].value("height", 25.0f)
+                );
+            }
+        } catch (json::parse_error& e) {
+            std::cerr << "JSON Parse Error: " << e.what() << std::endl;
+        }
+    }
+
     InitBricks();
     prevPaddleX = paddle.GetRect().x;
 }
@@ -32,14 +66,26 @@ void Game::HandleInput() {
         exitWindowRequest = true;
     }
 
-    if (gameRunning && !victory) {
-        if (IsKeyDown(KEY_LEFT)) paddle.MoveLeft(5.0f);
-        if (IsKeyDown(KEY_RIGHT)) paddle.MoveRight(5.0f);
+    if (currentState == GameState::MENU) {
+        if (IsKeyPressed(KEY_ENTER)) currentState = GameState::PLAYING;
+    } else if (currentState == GameState::PLAYING) {
+        if (IsKeyPressed(KEY_P)) currentState = GameState::PAUSED;
+        if (!victory) {
+            if (IsKeyDown(KEY_LEFT)) paddle.MoveLeft(5.0f);
+            if (IsKeyDown(KEY_RIGHT)) paddle.MoveRight(5.0f);
+        }
+    } else if (currentState == GameState::PAUSED) {
+        if (IsKeyPressed(KEY_P)) currentState = GameState::PLAYING;
+    } else if (currentState == GameState::GAMEOVER) {
+        if (IsKeyPressed(KEY_ENTER)) {
+            // Restart game logic can be complex, let's just allow quit for now
+            // exitWindowRequest = true;
+        }
     }
 }
 // 更新游戏状态：位置更新、碰撞检测、胜利条件等
 void Game::Update() {
-    if (!gameRunning || victory) return;
+    if (currentState != GameState::PLAYING || victory) return;
 
     float paddleVel = paddle.GetRect().x - prevPaddleX;
     
@@ -59,7 +105,7 @@ void Game::CheckBottomCollision() {
     if (ball.GetPosition().y + ball.GetRadius() >= screenHeight) {
         lives--;
         if (lives <= 0) {
-            gameRunning = false;
+            currentState = GameState::GAMEOVER;
         } else {
             ball.SetPosition({ screenWidth / 2.0f, screenHeight / 2.0f }); // 发球点居中
             ball.SetSpeed({ 4.0f, 4.0f });
@@ -132,7 +178,13 @@ void Game::Draw() {
     DrawText(TextFormat("SCORE: %d", score), 20, 20, 20, DARKGRAY);
     DrawText(TextFormat("LIVES: %d", lives), screenWidth - 120, 20, 20, MAROON);
 
-    if (!gameRunning) {
+    if (currentState == GameState::MENU) {
+        DrawText("BRICK BREAKER", screenWidth / 2 - 130, screenHeight / 2 - 50, 40, DARKBLUE);
+        DrawText("Press ENTER to Start", screenWidth / 2 - 130, screenHeight / 2 + 10, 20, DARKGRAY);
+    } else if (currentState == GameState::PAUSED) {
+        DrawText("PAUSED", screenWidth / 2 - 70, screenHeight / 2, 40, ORANGE);
+        DrawText("Press P to Resume", screenWidth / 2 - 100, screenHeight / 2 + 50, 20, GRAY);
+    } else if (currentState == GameState::GAMEOVER) {
         DrawText("GAME OVER!", screenWidth / 2 - 100, screenHeight / 2, 40, RED);
         DrawText("Press Q to Quit", screenWidth / 2 - 120, screenHeight / 2 + 50, 20, GRAY);
     } else if (victory) {

@@ -22,8 +22,10 @@ target_link_directories(breakout_week2 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/rayli
 
 # 3. Link the actual library file to our target
 target_link_libraries(breakout_week2 PUBLIC raylib.lib winmm.lib)
-
-
+# Copy config.json to build dir
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
 # --- Simple test target for collision logic ---
 add_executable(test_collision
     src/tests/test_collision.cpp

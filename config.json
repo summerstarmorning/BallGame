@@ -1,0 +1,21 @@
+{
+    "game": {
+        "screenWidth": 1024,
+        "screenHeight": 768,
+        "lives": 3
+    },
+    "ball": {
+        "startX": 512.0,
+        "startY": 384.0,
+        "speedX": 4.0,
+        "speedY": 4.0,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 437.0,
+        "startY": 700.0,
+        "width": 150.0,
+        "height": 25.0,
+        "speed": 5.0
+    }
+}

@@ -19,7 +19,8 @@ private:
     //生命值、分数、是否运行中、是否胜利、退出请求
     int lives;
     int score;
-    bool gameRunning;
+    enum class GameState { MENU, PLAYING, PAUSED, GAMEOVER };
+    GameState currentState;
     bool victory;
     bool exitWindowRequest;
     //碰撞参数
