@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
-project(breakout_week2)
+project(BallGame LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_executable(breakout_week2
     src/main.cpp
@@ -43,4 +47,17 @@ target_include_directories(test_collision PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/ra
 target_link_directories(test_collision PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/raylib/raylib-5.0_win64_msvc16/lib")
 target_link_libraries(test_collision PUBLIC raylib.lib winmm.lib)
 
+add_library(game_systems
+    src/BallManager.cpp
+    src/Config/PowerUpConfigLoader.cpp
+    src/Effects/ExpandPaddleEffect.cpp
+    src/Effects/MultiBallEffect.cpp
+    src/Effects/PowerUpEffect.cpp
+    src/Effects/SlowBallEffect.cpp
+    src/Particles/ParticleSystem.cpp
+    src/PowerUps/PowerUp.cpp
+    src/PowerUps/PowerUpFactory.cpp
+    src/PowerUps/PowerUpSystem.cpp
+)
 
+target_include_directories(game_systems PUBLIC include)
