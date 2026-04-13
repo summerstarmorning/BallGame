@@ -26,14 +26,21 @@ public:
     void update(float deltaSeconds);
     void render() const;
     void clear() noexcept;
+    void setReflectionBounds(const Rect& bounds) noexcept;
+    void setEdgeReflectionEnabled(bool enabled) noexcept;
+    void setReflectionDamping(float damping) noexcept;
 
     const std::vector<Particle>& particles() const noexcept { return particles_; }
 
 private:
     void emit(const Particle& particle);
+    void reflectOnEdges(Particle& particle) const noexcept;
     void removeExpired();
 
     std::vector<Particle> particles_ {};
     std::size_t maxParticles_ {512U};
+    Rect reflectionBounds_ {};
+    float reflectionDamping_ {0.82F};
+    bool edgeReflectionEnabled_ {false};
 };
 } // namespace game

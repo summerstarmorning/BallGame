@@ -1,6 +1,7 @@
 #include "Particles/ParticleSystem.hpp"
 
 #include <algorithm>
+#include <cmath>
 
 namespace game
 {
@@ -32,6 +33,7 @@ void ParticleSystem::update(float deltaSeconds)
         particle.ageSeconds += deltaSeconds;
         particle.position.x += particle.velocity.x * deltaSeconds;
         particle.position.y += particle.velocity.y * deltaSeconds;
+        reflectOnEdges(particle);
         particle.active = particle.ageSeconds < particle.lifetimeSeconds;
     }
 
@@ -48,6 +50,21 @@ void ParticleSystem::clear() noexcept
     particles_.clear();
 }
 
+void ParticleSystem::setReflectionBounds(const Rect& bounds) noexcept
+{
+    reflectionBounds_ = bounds;
+}
+
+void ParticleSystem::setEdgeReflectionEnabled(bool enabled) noexcept
+{
+    edgeReflectionEnabled_ = enabled;
+}
+
+void ParticleSystem::setReflectionDamping(float damping) noexcept
+{
+    reflectionDamping_ = std::clamp(damping, 0.0F, 1.0F);
+}
+
 void ParticleSystem::emit(const Particle& particle)
 {
     if (particles_.size() >= maxParticles_)
@@ -56,6 +73,41 @@ void ParticleSystem::emit(const Particle& particle)
     }
 
     particles_.push_back(particle);
+}
+
+void ParticleSystem::reflectOnEdges(Particle& particle) const noexcept
+{
+    if (!edgeReflectionEnabled_ || reflectionBounds_.width <= 0.0F || reflectionBounds_.height <= 0.0F)
+    {
+        return;
+    }
+
+    const float left = reflectionBounds_.x;
+    const float right = reflectionBounds_.x + reflectionBounds_.width;
+    const float top = reflectionBounds_.y;
+    const float bottom = reflectionBounds_.y + reflectionBounds_.height;
+
+    if (particle.position.x < left)
+    {
+        particle.position.x = left;
+        particle.velocity.x = std::abs(particle.velocity.x) * reflectionDamping_;
+    }
+    else if (particle.position.x > right)
+    {
+        particle.position.x = right;
+        particle.velocity.x = -std::abs(particle.velocity.x) * reflectionDamping_;
+    }
+
+    if (particle.position.y < top)
+    {
+        particle.position.y = top;
+        particle.velocity.y = std::abs(particle.velocity.y) * reflectionDamping_;
+    }
+    else if (particle.position.y > bottom)
+    {
+        particle.position.y = bottom;
+        particle.velocity.y = -std::abs(particle.velocity.y) * reflectionDamping_;
+    }
 }
 
 void ParticleSystem::removeExpired()

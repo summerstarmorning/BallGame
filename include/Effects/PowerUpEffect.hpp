@@ -15,10 +15,14 @@ public:
     virtual void apply(GameWorld& world) = 0;
     virtual void update(GameWorld& world, float deltaSeconds);
     virtual void expire(GameWorld& world) = 0;
+    virtual bool shouldReapplyOnLevelTransition() const noexcept { return true; }
+    virtual void onLevelStarted(GameWorld& world);
 
     bool isFinished() const noexcept;
     bool isPermanent() const noexcept { return config_.permanent; }
     PowerUpType type() const noexcept { return config_.type; }
+    float remainingSeconds() const noexcept;
+    void forceExpire(GameWorld& world);
 
 protected:
     const PowerUpConfig& config() const noexcept { return config_; }

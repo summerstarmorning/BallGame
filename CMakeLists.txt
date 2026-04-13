@@ -15,6 +15,7 @@ add_library(game_systems
     src/Particles/ParticleSystem.cpp
     src/PowerUps/PowerUp.cpp
     src/PowerUps/PowerUpFactory.cpp
+    src/PowerUps/PowerUpSystem.cpp
 )
 
 target_include_directories(game_systems PUBLIC include)
