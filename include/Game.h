@@ -13,6 +13,14 @@
  */
 class Game {
 private:
+    struct EdgeParticle {
+        Vector2 position;
+        Vector2 velocity;
+        float life;
+        float maxLife;
+        float size;
+        Color color;
+    };
     /** @brief 屏幕宽度 */
     int screenWidth;
     /** @brief 屏幕高度 */
@@ -58,6 +66,8 @@ private:
     float prevPaddleX;
 
     int currentLevel;
+    std::vector<EdgeParticle> edgeParticles;
+    static constexpr int MAX_EDGE_PARTICLES = 600;
 
     /**
      * @brief 初始化指定关卡的砖块布局及参数
@@ -85,6 +95,9 @@ private:
      * @brief 初始化砖块
      */
     void InitBricks();
+    void SpawnEdgeParticles(const Vector2& origin, const Vector2& normal, int count);
+    void UpdateEdgeParticles();
+    void DrawEdgeParticles() const;
 
 public:
     /**

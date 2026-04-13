@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 #include <fstream>
@@ -42,6 +43,7 @@ Game::Game(int width, int height)
 
 void Game::InitConfigAndBricks(const std::string& levelJsonFile) {
     bricks.clear();
+    edgeParticles.clear();
     std::ifstream f(levelJsonFile);
     if (f.is_open()) {
         try {
@@ -95,6 +97,101 @@ void Game::InitBricks() {
             float y = startY + i * (brickHeight + gapY);
             bricks.emplace_back(x, y, brickWidth, brickHeight);
         }
+    }
+}
+
+void Game::SpawnEdgeParticles(const Vector2& origin, const Vector2& normal, int count) {
+    if (count <= 0) {
+        return;
+    }
+
+    const Vector2 tangent = { -normal.y, normal.x };
+
+    for (int i = 0; i < count; ++i) {
+        const float normalSpeed = 100.0f + static_cast<float>(GetRandomValue(0, 90));
+        const float tangentSpeed = static_cast<float>(GetRandomValue(-70, 70));
+        const float maxLife = 0.30f + static_cast<float>(GetRandomValue(0, 55)) / 100.0f;
+        const float size = 1.8f + static_cast<float>(GetRandomValue(0, 18)) / 10.0f;
+
+        EdgeParticle particle {};
+        particle.position = origin;
+        particle.velocity = {
+            normal.x * normalSpeed + tangent.x * tangentSpeed,
+            normal.y * normalSpeed + tangent.y * tangentSpeed
+        };
+        particle.life = maxLife;
+        particle.maxLife = maxLife;
+        particle.size = size;
+        particle.color = ballColor;
+
+        edgeParticles.push_back(particle);
+    }
+
+    if (static_cast<int>(edgeParticles.size()) > MAX_EDGE_PARTICLES) {
+        const std::size_t overflow = edgeParticles.size() - static_cast<std::size_t>(MAX_EDGE_PARTICLES);
+        edgeParticles.erase(edgeParticles.begin(), edgeParticles.begin() + overflow);
+    }
+}
+
+void Game::UpdateEdgeParticles() {
+    const float dt = GetFrameTime();
+    const float left = 5.0f;
+    const float right = static_cast<float>(screenWidth) - 5.0f;
+    const float top = 5.0f;
+    const float bottom = static_cast<float>(screenHeight) - 5.0f;
+    const float damping = 0.78f;
+
+    for (EdgeParticle& particle : edgeParticles) {
+        particle.life -= dt;
+        particle.position.x += particle.velocity.x * dt;
+        particle.position.y += particle.velocity.y * dt;
+        particle.velocity.y += 95.0f * dt;
+
+        if (particle.position.x < left) {
+            particle.position.x = left;
+            if (particle.velocity.x < 0.0f) {
+                particle.velocity.x = -particle.velocity.x * damping;
+            }
+        } else if (particle.position.x > right) {
+            particle.position.x = right;
+            if (particle.velocity.x > 0.0f) {
+                particle.velocity.x = -particle.velocity.x * damping;
+            }
+        }
+
+        if (particle.position.y < top) {
+            particle.position.y = top;
+            if (particle.velocity.y < 0.0f) {
+                particle.velocity.y = -particle.velocity.y * damping;
+            }
+        } else if (particle.position.y > bottom) {
+            particle.position.y = bottom;
+            if (particle.velocity.y > 0.0f) {
+                particle.velocity.y = -particle.velocity.y * damping;
+            }
+        }
+    }
+
+    edgeParticles.erase(
+        std::remove_if(
+            edgeParticles.begin(),
+            edgeParticles.end(),
+            [](const EdgeParticle& particle) {
+                return particle.life <= 0.0f;
+            }),
+        edgeParticles.end());
+}
+
+void Game::DrawEdgeParticles() const {
+    for (const EdgeParticle& particle : edgeParticles) {
+        if (particle.maxLife <= 0.0f) {
+            continue;
+        }
+
+        const float lifeRatio = std::clamp(particle.life / particle.maxLife, 0.0f, 1.0f);
+        Color drawColor = particle.color;
+        drawColor.a = static_cast<unsigned char>(230.0f * lifeRatio);
+        DrawCircleV(particle.position, particle.size * (0.45f + 0.55f * lifeRatio), drawColor);
     }
 }
 // 是否请求关闭窗口
@@ -187,17 +284,40 @@ void Game::HandleInput() {
 }
 // 更新游戏状态：位置更新、碰撞检测、胜利条件等
 void Game::Update() {
-    if (currentState != GameState::PLAYING || victory) return;
+    if (currentState != GameState::PLAYING || victory) {
+        UpdateEdgeParticles();
+        return;
+    }
 
     float paddleVel = paddle.GetRect().x - prevPaddleX;
     
     // 外部边界物理与位置更新
     ball.Move();
+    const Vector2 speedBeforeBounce = ball.GetSpeed();
     ball.BounceEdge(screenWidth, screenHeight);
+    const Vector2 speedAfterBounce = ball.GetSpeed();
+
+    const float contactPadding = ball.GetRadius() + 2.0f;
+    const Vector2 ballPos = ball.GetPosition();
+    if ((speedBeforeBounce.x < 0.0f && speedAfterBounce.x > 0.0f)
+        || (speedBeforeBounce.x > 0.0f && speedAfterBounce.x < 0.0f)) {
+        const Vector2 normal = { speedAfterBounce.x > 0.0f ? 1.0f : -1.0f, 0.0f };
+        const Vector2 origin = {
+            normal.x > 0.0f ? contactPadding : static_cast<float>(screenWidth) - contactPadding,
+            ballPos.y
+        };
+        SpawnEdgeParticles(origin, normal, 12);
+    }
+    if (speedBeforeBounce.y < 0.0f && speedAfterBounce.y > 0.0f) {
+        const Vector2 normal = { 0.0f, 1.0f };
+        const Vector2 origin = { ballPos.x, contactPadding };
+        SpawnEdgeParticles(origin, normal, 12);
+    }
 
     CheckBottomCollision();
     HandlePaddleCollision(paddleVel);
     HandleBrickCollision();
+    UpdateEdgeParticles();
     
     // 更新上一帧挡板位置
     prevPaddleX = paddle.GetRect().x;
@@ -299,6 +419,7 @@ void Game::Draw() {
 
     if (currentState == GameState::PLAYING || currentState == GameState::PAUSED || currentState == GameState::GAMEOVER || victory) {
         // 实体
+        DrawEdgeParticles();
         ball.Draw(ballColor);
         paddle.Draw(paddleColor);
         for (auto& brick : bricks) {
