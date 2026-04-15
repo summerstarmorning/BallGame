@@ -15,6 +15,9 @@ public:
     void Draw(Color c = BLUE);
     void MoveLeft(float speed);
     void MoveRight(float speed);
+    void MoveUp(float speed, float minY);
+    void MoveDown(float speed, float maxY);
+    void SetRect(const Rectangle& newRect);
     
     Rectangle GetRect() const { return rect; }
 };

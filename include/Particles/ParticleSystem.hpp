@@ -23,6 +23,7 @@ public:
 
     void spawnBrickBurst(const Vec2& origin, std::size_t count);
     void spawnPowerUpTrail(const Vec2& origin, std::size_t count);
+    void spawnBallTrail(const Vec2& origin, const Vec2& velocity, const Color& tint, std::size_t count);
     void update(float deltaSeconds);
     void render() const;
     void clear() noexcept;

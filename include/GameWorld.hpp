@@ -18,5 +18,6 @@ public:
     BallManager* ballManager {nullptr};
     ParticleSystem* particleSystem {nullptr};
     std::vector<std::unique_ptr<PowerUpEffect>>* activeEffects {nullptr};
+    float* paddleSpeedMultiplier {nullptr};
 };
 } // namespace game

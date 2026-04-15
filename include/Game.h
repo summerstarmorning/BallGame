@@ -1,56 +1,58 @@
 #pragma once
 
-#include "raylib.h"
-#include "Ball.h"
-#include "Paddle.h"
-#include "Brick.h"
-#include <vector>
+#include <memory>
+#include <optional>
 #include <string>
+#include <vector>
 
-/**
- * @class Game
- * @brief 游戏核心管理类，负责维护状态机、物理更新、UI渲染与实体对象的交互。
- */
+#include "BallManager.hpp"
+#include "Brick.h"
+#include "Config/PowerUpConfig.hpp"
+#include "GameWorld.hpp"
+#include "Paddle.h"
+#include "Paddle.hpp"
+#include "Particles/ParticleSystem.hpp"
+#include "PowerUps/PowerUpSystem.hpp"
+#include "raylib.h"
+
 class Game {
 private:
+    static constexpr float WALL_THICKNESS = 5.0f;
+    static constexpr float PADDLE_BASE_SPEED = 8.5f;
+    static constexpr int PAUSE_BUTTON_SIZE = 34;
+    static constexpr float HUD_HEIGHT = 78.0f;
+
     struct EdgeParticle {
-        Vector2 position;
-        Vector2 velocity;
-        float life;
-        float maxLife;
-        float size;
-        Color color;
+        Vector2 position {};
+        Vector2 velocity {};
+        float life {0.0f};
+        float maxLife {0.0f};
+        float size {0.0f};
+        Color color {};
     };
-    /** @brief 屏幕宽度 */
+
+    struct BackgroundPack {
+        Texture2D menu {};
+        std::vector<Texture2D> levels {};
+    };
+
+    enum class GameState { MENU, PLAYING, PAUSED, GAMEOVER };
+
     int screenWidth;
-    /** @brief 屏幕高度 */
     int screenHeight;
-    /** @brief 游戏主角：小球 */
-    Ball ball;
-    /** @brief 玩家控制的挡板 */
+
     Paddle paddle;
-    /** @brief 场景中所有砖块的集合 */
     std::vector<Brick> bricks;
 
-    /** @brief 玩家剩余生命值 */
     int lives;
-    /** @brief 当前得分 */
+    int levelStartLives;
     int score;
 
-    /** @enum GameState
-     *  @brief 枚举所有的游戏运行状态 
-     */
-    enum class GameState { MENU, PLAYING, PAUSED, GAMEOVER };
-    /** @brief 记录当前所处的游戏状态 */
     GameState currentState;
-    /** @brief 判定是否赢得了本局游戏 */
     bool victory;
-    /** @brief 是否收到退出游戏窗口的请求 */
     bool exitWindowRequest;
 
-    /** @brief 是否为深色模式 */
     bool isDarkMode;
-    /** @brief 是否处于调试/无敌模式 */
     bool debugMode;
 
     Color ballColor;
@@ -60,72 +62,67 @@ private:
     int paddleColorIndex;
     int brickColorIndex;
 
-    const float HIT_OFFSET_FACTOR = 4.0f;
     const float PADDLE_INFLUENCE = 0.2f;
     const float MAX_H_SPEED = 10.0f;
     float prevPaddleX;
 
     int currentLevel;
     std::vector<EdgeParticle> edgeParticles;
+    std::vector<std::optional<game::PowerUpType>> brickPowerUps;
     static constexpr int MAX_EDGE_PARTICLES = 600;
 
-    /**
-     * @brief 初始化指定关卡的砖块布局及参数
-     * @param levelJsonFile 关卡的 JSON 配置文件路径
-     */
+    game::BallManager ballManager;
+    game::ParticleSystem particleSystem;
+    game::PowerUpSystem powerUpSystem;
+    game::PowerUpConfigSet powerUpConfigSet;
+    game::GameWorld world;
+    std::unique_ptr<game::Paddle> effectPaddle;
+
+    Vector2 spawnBallPosition;
+    Vector2 spawnBallVelocity;
+    float spawnBallRadius;
+    float paddleSpeedMultiplier;
+    Font uiFont {};
+    bool hasUiFont;
+    BackgroundPack darkBackgrounds {};
+    BackgroundPack lightBackgrounds {};
+
     void InitConfigAndBricks(const std::string& levelJsonFile);
-
-    /**
-     * @brief 检查小球是否触碰屏幕底部边界区域
-     */
-    void CheckBottomCollision();
-
-    /**
-     * @brief 判定并响应小球与挡板之间的碰撞
-     * @param paddleVel 挡板此帧移动速度，用于累加切向力
-     */
-    void HandlePaddleCollision(float paddleVel);
-
-    /**
-     * @brief 遍历处理小球与所有砖块的物理碰撞检查
-     */
-    void HandleBrickCollision();
-
-    /**
-     * @brief 初始化砖块
-     */
     void InitBricks();
+    void AssignPowerUpsToBricks();
+    void LoadPowerUpConfig();
+    void LoadBackgroundTextures();
+    void UnloadBackgroundTextures();
+    void ResetBalls();
+
+    void SyncEffectPaddleToGameplay();
+    void ApplyEffectPaddleToGameplay();
+
+    void HandleBalls(float paddleVel);
+    void HandleBallEdgeCollision(game::Ball& managedBall);
+    void HandleBallPaddleCollision(game::Ball& managedBall, float paddleVel);
+    void HandleBallBrickCollision(game::Ball& managedBall);
+    void CheckLevelProgress();
+    void MaybeSpawnPowerUpFromBrick(std::size_t brickIndex, const Rectangle& brickRect);
+    Color GetBrickDisplayColor(std::size_t brickIndex, Color baseColor, float timeSeconds, float globalGlow) const;
+
     void SpawnEdgeParticles(const Vector2& origin, const Vector2& normal, int count);
     void UpdateEdgeParticles();
     void DrawEdgeParticles() const;
+    void DrawPowerUps() const;
+    void DrawParticles() const;
+    void DrawActiveEffects() const;
+    void DrawLocalized(const char* zhText, const char* enText, float x, float y, float fontSize, Color color) const;
+    void DrawLocalizedf(const char* zhPrefix, const char* enPrefix, int value, float x, float y, float fontSize, Color color) const;
+    float PaddleMinY() const;
+    float PaddleMaxY() const;
+    const Texture2D* ResolveCurrentBackground() const;
 
 public:
-    /**
-     * @brief Game 类的构造函数，初始化游戏窗口相关及启动主菜单
-     * @param width  窗口的宽度
-     * @param height 窗口的高度
-     */
     Game(int width, int height);
-
-    /**
-     * @brief 查询当前是否应该关闭主窗口
-     * @return 返回 true 代表接受到退出指令
-     */
+    ~Game();
     bool ShouldClose() const;
-
-    /**
-     * @brief 处理所有来着用户的输入(如移动按键、UI点击)
-     */
     void HandleInput();
-
-    /**
-     * @brief 执行游戏核心物理与业务逻辑的统一更新
-     */
     void Update();
-
-    /**
-     * @brief 对全游戏场景和UI进行当帧画面的渲染
-     */
     void Draw();
-
 };

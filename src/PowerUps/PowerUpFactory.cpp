@@ -1,26 +1,57 @@
 #include "PowerUps/PowerUpFactory.hpp"
 
 #include <stdexcept>
+#include <utility>
 
 #include "Effects/ExpandPaddleEffect.hpp"
 #include "Effects/MultiBallEffect.hpp"
+#include "Effects/PaddleSpeedEffect.hpp"
 #include "Effects/PowerUpEffect.hpp"
 #include "Effects/SlowBallEffect.hpp"
 
 namespace game
 {
+PowerUpFactory::PowerUpFactory()
+{
+    registerCreator(
+        PowerUpType::ExpandPaddle,
+        [](const PowerUpConfig& config)
+        {
+            return std::make_unique<ExpandPaddleEffect>(config);
+        });
+    registerCreator(
+        PowerUpType::MultiBall,
+        [](const PowerUpConfig& config)
+        {
+            return std::make_unique<MultiBallEffect>(config);
+        });
+    registerCreator(
+        PowerUpType::SlowBall,
+        [](const PowerUpConfig& config)
+        {
+            return std::make_unique<SlowBallEffect>(config);
+        });
+    registerCreator(
+        PowerUpType::PaddleSpeed,
+        [](const PowerUpConfig& config)
+        {
+            return std::make_unique<PaddleSpeedEffect>(config);
+        });
+}
+
+void PowerUpFactory::registerCreator(PowerUpType type, Creator creator)
+{
+    creators_[type] = std::move(creator);
+}
+
 std::unique_ptr<PowerUpEffect> PowerUpFactory::create(const PowerUpConfig& config) const
 {
-    switch (config.type)
+    const auto it = creators_.find(config.type);
+    if (it == creators_.end())
     {
-    case PowerUpType::ExpandPaddle:
-        return std::make_unique<ExpandPaddleEffect>(config);
-    case PowerUpType::MultiBall:
-        return std::make_unique<MultiBallEffect>(config);
-    case PowerUpType::SlowBall:
-        return std::make_unique<SlowBallEffect>(config);
+        throw std::runtime_error("Missing factory registration for power-up.");
     }
 
-    throw std::runtime_error("Missing factory registration for power-up.");
+    return it->second(config);
 }
 } // namespace game

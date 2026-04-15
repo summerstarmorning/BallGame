@@ -12,7 +12,7 @@ namespace game
 {
 namespace
 {
-constexpr float kPowerUpFallSpeed = 90.0F;
+constexpr float kPowerUpFallSpeed = 260.0F;
 }
 
 PowerUpSystem::PowerUpSystem() = default;
@@ -120,6 +120,24 @@ void PowerUpSystem::activate(PowerUpType type, GameWorld& world)
     const auto configIt = configByType_.find(type);
     if (configIt == configByType_.end())
     {
+        return;
+    }
+
+    for (std::unique_ptr<PowerUpEffect>& activeEffect : activeEffects_)
+    {
+        if (!activeEffect || activeEffect->isFinished() || activeEffect->type() != type)
+        {
+            continue;
+        }
+
+        if (activeEffect->isPermanent())
+        {
+            activeEffect->apply(world);
+            return;
+        }
+
+        activeEffect->extendDuration(configIt->second.durationSeconds);
+        activeEffect->apply(world);
         return;
     }
 

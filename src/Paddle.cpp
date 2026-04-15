@@ -26,3 +26,21 @@ void Paddle::MoveRight(float speed) {
         rect.x = rightBound - rect.width;
     }
 }
+
+void Paddle::MoveUp(float speed, float minY) {
+    rect.y -= speed;
+    if (rect.y < minY) {
+        rect.y = minY;
+    }
+}
+
+void Paddle::MoveDown(float speed, float maxY) {
+    rect.y += speed;
+    if (rect.y + rect.height > maxY) {
+        rect.y = maxY - rect.height;
+    }
+}
+
+void Paddle::SetRect(const Rectangle& newRect) {
+    rect = newRect;
+}

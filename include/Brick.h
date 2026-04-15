@@ -4,22 +4,27 @@
 #include "raylib.h"
 
 class Brick {
-// 形状
-// 存活状态
+public:
+    enum class Shape : unsigned char {
+        Rect = 0,
+        Rounded = 1,
+        Capsule = 2,
+        Slant = 3,
+    };
+
 private:
     Rectangle rect;
     bool active;
-    
-// 构造参数：形状
-// 渲染
-// 是否存活状态接口
-// 设置存活状态
+    Shape shape;
+
 public:
-    Brick(float x, float y, float w, float h);
+    Brick(float x, float y, float w, float h, int shapeType = 1);
     void Draw(Color c = GREEN);
     bool IsActive() const { return active; }
     void SetActive(bool a) { active = a; }
-    
+    void SetShape(int shapeType);
+    int GetShape() const { return static_cast<int>(shape); }
+
     Rectangle GetRect() const { return rect; }
 };
 

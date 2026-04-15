@@ -21,7 +21,11 @@ public:
     bool isFinished() const noexcept;
     bool isPermanent() const noexcept { return config_.permanent; }
     PowerUpType type() const noexcept { return config_.type; }
+    float durationSeconds() const noexcept { return config_.durationSeconds; }
+    float magnitude() const noexcept { return config_.magnitude; }
+    float totalDurationSeconds() const noexcept;
     float remainingSeconds() const noexcept;
+    void extendDuration(float extraSeconds) noexcept;
     void forceExpire(GameWorld& world);
 
 protected:
@@ -31,6 +35,7 @@ protected:
 private:
     PowerUpConfig config_ {};
     float elapsedSeconds_ {0.0F};
+    float bonusDurationSeconds_ {0.0F};
     bool finished_ {false};
     bool expired_ {false};
 };

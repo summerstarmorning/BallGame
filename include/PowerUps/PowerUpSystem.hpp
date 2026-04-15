@@ -5,13 +5,13 @@
 #include <vector>
 
 #include "Config/PowerUpConfig.hpp"
+#include "Effects/PowerUpEffect.hpp"
 #include "GameTypes.hpp"
 #include "PowerUps/PowerUp.hpp"
 
 namespace game
 {
 class GameWorld;
-class PowerUpEffect;
 class PowerUpFactory;
 
 class PowerUpSystem

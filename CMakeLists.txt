@@ -8,6 +8,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(breakout_week2
     src/main.cpp
     src/Game.cpp
+    src/GamePlay.cpp
+    src/GameRender.cpp
     src/Ball.cpp
     src/Paddle.cpp
     src/Brick.cpp
@@ -52,6 +54,7 @@ add_library(game_systems
     src/Config/PowerUpConfigLoader.cpp
     src/Effects/ExpandPaddleEffect.cpp
     src/Effects/MultiBallEffect.cpp
+    src/Effects/PaddleSpeedEffect.cpp
     src/Effects/PowerUpEffect.cpp
     src/Effects/SlowBallEffect.cpp
     src/Particles/ParticleSystem.cpp
@@ -61,3 +64,4 @@ add_library(game_systems
 )
 
 target_include_directories(game_systems PUBLIC include)
+target_link_libraries(breakout_week2 PRIVATE game_systems)

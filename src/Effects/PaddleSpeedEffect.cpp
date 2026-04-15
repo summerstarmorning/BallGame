@@ -1,16 +1,15 @@
-#include "Effects/ExpandPaddleEffect.hpp"
+#include "Effects/PaddleSpeedEffect.hpp"
 
 #include <algorithm>
 
 #include "Effects/PowerUpEffect.hpp"
 #include "GameWorld.hpp"
-#include "Paddle.hpp"
 
 namespace game
 {
-void ExpandPaddleEffect::apply(GameWorld& world)
+void PaddleSpeedEffect::apply(GameWorld& world)
 {
-    if (world.paddle == nullptr)
+    if (world.paddleSpeedMultiplier == nullptr)
     {
         return;
     }
@@ -20,7 +19,7 @@ void ExpandPaddleEffect::apply(GameWorld& world)
     {
         for (const std::unique_ptr<PowerUpEffect>& effect : *world.activeEffects)
         {
-            if (!effect || effect->isFinished() || effect->type() != PowerUpType::ExpandPaddle)
+            if (!effect || effect->isFinished() || effect->type() != PowerUpType::PaddleSpeed)
             {
                 continue;
             }
@@ -29,12 +28,12 @@ void ExpandPaddleEffect::apply(GameWorld& world)
         }
     }
 
-    world.paddle->setWidthMultiplier(std::max(1.0F, bestMultiplier));
+    *world.paddleSpeedMultiplier = std::max(1.0F, bestMultiplier);
 }
 
-void ExpandPaddleEffect::expire(GameWorld& world)
+void PaddleSpeedEffect::expire(GameWorld& world)
 {
-    if (world.paddle == nullptr)
+    if (world.paddleSpeedMultiplier == nullptr)
     {
         return;
     }
@@ -44,7 +43,7 @@ void ExpandPaddleEffect::expire(GameWorld& world)
     {
         for (const std::unique_ptr<PowerUpEffect>& effect : *world.activeEffects)
         {
-            if (!effect || effect.get() == this || effect->isFinished() || effect->type() != PowerUpType::ExpandPaddle)
+            if (!effect || effect.get() == this || effect->isFinished() || effect->type() != PowerUpType::PaddleSpeed)
             {
                 continue;
             }
@@ -53,12 +52,6 @@ void ExpandPaddleEffect::expire(GameWorld& world)
         }
     }
 
-    if (bestMultiplier <= 1.0F)
-    {
-        world.paddle->resetWidth();
-        return;
-    }
-
-    world.paddle->setWidthMultiplier(bestMultiplier);
+    *world.paddleSpeedMultiplier = std::max(1.0F, bestMultiplier);
 }
 } // namespace game

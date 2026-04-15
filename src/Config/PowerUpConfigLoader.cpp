@@ -1,10 +1,15 @@
 #include "Config/PowerUpConfigLoader.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <stdexcept>
 
+#include "nlohmann_json.hpp"
+
 namespace game
 {
+using json = nlohmann::json;
+
 std::string toString(PowerUpType type)
 {
     switch (type)
@@ -15,6 +20,8 @@ std::string toString(PowerUpType type)
         return "multi_ball";
     case PowerUpType::SlowBall:
         return "slow_ball";
+    case PowerUpType::PaddleSpeed:
+        return "paddle_speed";
     }
 
     throw std::runtime_error("Unknown PowerUpType.");
@@ -37,6 +44,11 @@ PowerUpType powerUpTypeFromString(const std::string& value)
         return PowerUpType::SlowBall;
     }
 
+    if (value == "paddle_speed")
+    {
+        return PowerUpType::PaddleSpeed;
+    }
+
     throw std::runtime_error("Unsupported power-up type: " + value);
 }
 
@@ -48,8 +60,51 @@ PowerUpConfigSet PowerUpConfigLoader::loadFromFile(const std::filesystem::path& 
         throw std::runtime_error("Unable to open config file: " + path.string());
     }
 
-    // JSON parsing should be wired to your chosen library here, for example nlohmann/json.
-    // The interface is already isolated so the parser can be swapped without changing gameplay code.
-    throw std::runtime_error("JSON parsing is not wired yet. Connect your JSON library in PowerUpConfigLoader.");
+    json document = json::parse(input, nullptr, true, true);
+
+    PowerUpConfigSet configSet {};
+
+    if (document.contains("particles") && document["particles"].is_object())
+    {
+        const json& particles = document["particles"];
+        configSet.particles.maxCount = particles.value("maxCount", configSet.particles.maxCount);
+        configSet.particles.brickBurstCount = particles.value("brickBurstCount", configSet.particles.brickBurstCount);
+        configSet.particles.powerUpTrailCount = particles.value("powerUpTrailCount", configSet.particles.powerUpTrailCount);
+    }
+
+    if (!document.contains("powerups") || !document["powerups"].is_array())
+    {
+        throw std::runtime_error("Invalid power-up config: missing array field 'powerups'.");
+    }
+
+    for (const json& item : document["powerups"])
+    {
+        if (!item.is_object())
+        {
+            continue;
+        }
+
+        const std::string typeName = item.value("type", "");
+        if (typeName.empty())
+        {
+            continue;
+        }
+
+        PowerUpConfig config {};
+        config.type = powerUpTypeFromString(typeName);
+        config.dropChance = std::clamp(item.value("dropChance", 0.0F), 0.0F, 1.0F);
+        config.durationSeconds = std::max(0.0F, item.value("durationSeconds", 0.0F));
+        config.magnitude = std::max(0.0F, item.value("magnitude", 1.0F));
+        config.permanent = item.value("permanent", false);
+
+        configSet.powerUps[config.type] = config;
+    }
+
+    if (configSet.powerUps.empty())
+    {
+        throw std::runtime_error("Power-up config array is empty.");
+    }
+
+    return configSet;
 }
 } // namespace game

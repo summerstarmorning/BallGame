@@ -14,7 +14,7 @@ void PowerUpEffect::update(GameWorld& world, float deltaSeconds)
     }
 
     elapsedSeconds_ += deltaSeconds;
-    if (elapsedSeconds_ >= config().durationSeconds)
+    if (elapsedSeconds_ >= totalDurationSeconds())
     {
         finish(world);
     }
@@ -42,7 +42,22 @@ float PowerUpEffect::remainingSeconds() const noexcept
         return 0.0F;
     }
 
-    return std::max(0.0F, config().durationSeconds - elapsedSeconds_);
+    return std::max(0.0F, totalDurationSeconds() - elapsedSeconds_);
+}
+
+float PowerUpEffect::totalDurationSeconds() const noexcept
+{
+    return config().durationSeconds + bonusDurationSeconds_;
+}
+
+void PowerUpEffect::extendDuration(float extraSeconds) noexcept
+{
+    if (config().permanent || extraSeconds <= 0.0F)
+    {
+        return;
+    }
+
+    bonusDurationSeconds_ += extraSeconds;
 }
 
 void PowerUpEffect::forceExpire(GameWorld& world)
