@@ -78,6 +78,8 @@ inline const char* effectLabelEn(game::PowerUpType type)
         return "BALL BOOST";
     case game::PowerUpType::PaddleSpeed:
         return "PADDLE BOOST";
+    case game::PowerUpType::PierceBall:
+        return "PIERCE SHOT";
     }
 
     return "EFFECT";
@@ -95,6 +97,8 @@ inline const char* effectLabelZh(game::PowerUpType type)
         return u8"\u7403\u901f\u63d0\u5347";
     case game::PowerUpType::PaddleSpeed:
         return u8"\u6321\u677f\u52a0\u901f";
+    case game::PowerUpType::PierceBall:
+        return u8"\u8d2f\u7a7f\u5f39";
     }
 
     return u8"\u9053\u5177\u6548\u679c";
@@ -112,6 +116,8 @@ inline const char* powerUpGlyph(game::PowerUpType type)
         return "S";
     case game::PowerUpType::PaddleSpeed:
         return "B";
+    case game::PowerUpType::PierceBall:
+        return "P";
     }
 
     return "?";
@@ -129,6 +135,8 @@ inline Color powerUpColor(game::PowerUpType type)
         return ORANGE;
     case game::PowerUpType::PaddleSpeed:
         return Color {255, 108, 232, 255};
+    case game::PowerUpType::PierceBall:
+        return Color {255, 92, 92, 255};
     }
 
     return GRAY;

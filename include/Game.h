@@ -1,8 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "BallManager.hpp"
@@ -12,6 +14,7 @@
 #include "Paddle.h"
 #include "Paddle.hpp"
 #include "Particles/ParticleSystem.hpp"
+#include "Profile/PlayerProfile.hpp"
 #include "PowerUps/PowerUpSystem.hpp"
 #include "raylib.h"
 
@@ -34,6 +37,20 @@ private:
     struct BackgroundPack {
         Texture2D menu {};
         std::vector<Texture2D> levels {};
+    };
+
+    struct MenuStyleButtonRects {
+        Rectangle theme {};
+        Rectangle ball {};
+        Rectangle paddle {};
+        Rectangle brick {};
+    };
+
+    struct AsyncLoadSharedState {
+        float progress {0.0F};
+        bool finished {false};
+        int preparedBrickColorIndex {2};
+        bool preparedDarkMode {false};
     };
 
     enum class GameState { MENU, PLAYING, PAUSED, GAMEOVER };
@@ -62,9 +79,8 @@ private:
     int paddleColorIndex;
     int brickColorIndex;
 
-    const float PADDLE_INFLUENCE = 0.2f;
-    const float MAX_H_SPEED = 10.0f;
-    float prevPaddleX;
+    static constexpr float PADDLE_BASE_SPEED_PIXELS_PER_SECOND = PADDLE_BASE_SPEED * 60.0F;
+    Vector2 prevPaddlePosition;
 
     int currentLevel;
     std::vector<EdgeParticle> edgeParticles;
@@ -82,10 +98,21 @@ private:
     Vector2 spawnBallVelocity;
     float spawnBallRadius;
     float paddleSpeedMultiplier;
+    int pendingPierceCharges;
+    game::PlayerProfile playerProfile;
+    float profileSaveAccumulator;
     Font uiFont {};
+    Font displayFont {};
     bool hasUiFont;
+    bool hasDisplayFont;
     BackgroundPack darkBackgrounds {};
     BackgroundPack lightBackgrounds {};
+    std::mutex asyncLoadMutex {};
+    std::thread asyncLoadThread {};
+    AsyncLoadSharedState asyncLoadShared {};
+    bool asyncLoadActive {false};
+    float asyncLoadProgressUi {0.0F};
+    float asyncLoadSuccessTimer {0.0F};
 
     void InitConfigAndBricks(const std::string& levelJsonFile);
     void InitBricks();
@@ -93,14 +120,19 @@ private:
     void LoadPowerUpConfig();
     void LoadBackgroundTextures();
     void UnloadBackgroundTextures();
+    void LoadPlayerProfile();
+    void SavePlayerProfile();
+    void RegisterBrickDestroyed(int durability);
+    void RegisterPowerUpCollected();
+    void FinalizeRunProgress();
     void ResetBalls();
 
     void SyncEffectPaddleToGameplay();
     void ApplyEffectPaddleToGameplay();
 
-    void HandleBalls(float paddleVel);
+    void HandleBalls(const game::Vec2& paddleVelocity, float deltaSeconds);
     void HandleBallEdgeCollision(game::Ball& managedBall);
-    void HandleBallPaddleCollision(game::Ball& managedBall, float paddleVel);
+    void HandleBallPaddleCollision(game::Ball& managedBall, const game::Vec2& paddleVelocity);
     void HandleBallBrickCollision(game::Ball& managedBall);
     void CheckLevelProgress();
     void MaybeSpawnPowerUpFromBrick(std::size_t brickIndex, const Rectangle& brickRect);
@@ -114,9 +146,15 @@ private:
     void DrawActiveEffects() const;
     void DrawLocalized(const char* zhText, const char* enText, float x, float y, float fontSize, Color color) const;
     void DrawLocalizedf(const char* zhPrefix, const char* enPrefix, int value, float x, float y, float fontSize, Color color) const;
+    void DrawDisplayText(const char* text, Vector2 position, float fontSize, float spacing, Color color) const;
+    float MeasureDisplayTextWidth(const char* text, float fontSize, float spacing) const;
     float PaddleMinY() const;
     float PaddleMaxY() const;
     const Texture2D* ResolveCurrentBackground() const;
+    MenuStyleButtonRects MenuStyleButtons() const;
+    void StartAsyncLoadDemo();
+    void PollAsyncLoadDemo(float deltaSeconds);
+    void JoinAsyncLoadThread();
 
 public:
     Game(int width, int height);

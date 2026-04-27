@@ -27,6 +27,13 @@
       "durationSeconds": 14.0,
       "magnitude": 1.7,
       "permanent": false
+    },
+    {
+      "type": "pierce_ball",
+      "dropChance": 0.18,
+      "durationSeconds": 0.0,
+      "magnitude": 4.0,
+      "permanent": true
     }
   ],
   "particles": {

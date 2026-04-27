@@ -5,6 +5,7 @@
 
 #include "BallManager.hpp"
 #include "Particles/ParticleSystem.hpp"
+#include "Profile/PlayerProfile.hpp"
 
 namespace game
 {
@@ -19,5 +20,7 @@ public:
     ParticleSystem* particleSystem {nullptr};
     std::vector<std::unique_ptr<PowerUpEffect>>* activeEffects {nullptr};
     float* paddleSpeedMultiplier {nullptr};
+    int* pierceCharges {nullptr};
+    PlayerProfile* playerProfile {nullptr};
 };
 } // namespace game

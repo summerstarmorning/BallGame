@@ -16,6 +16,7 @@
 - `BallManager`: owns all balls, updates them safely, and decides when the player actually loses a life.
 - `ParticleSystem`: owns particle spawning, culling, and capped counts for performance.
 - `PowerUpConfigLoader`: converts JSON records into strongly typed gameplay parameters.
+- `PlayerProfileStore`: persists long-term profile, economy, and lifetime stats outside one-off run state.
 
 ## Flow
 
@@ -24,6 +25,34 @@
 3. On pickup, `PowerUpFactory` creates the matching `PowerUpEffect`.
 4. Active effects are updated each frame and automatically expire when needed.
 5. `BallManager` only reports life loss when every ball has left play.
+
+## Ball Physics Notes
+
+- Paddle movement is measured as a 2D velocity vector each frame, not just horizontal displacement.
+- Ball-vs-rectangle collisions resolve in two stages: penetration correction, then reflection using relative velocity.
+- Paddle motion transfer is intentionally damped before reflection, with a much softer vertical contribution than horizontal contribution.
+- After collision response, ball speed magnitude is preserved, but the travel direction is constrained so the vertical component never collapses into a near-horizontal path.
+- This keeps paddle push effects from vertical movement while preventing late-game trajectories that feel flat and hard to recover.
+
+## Brick Rules
+
+- Bricks can spawn with multiple durability tiers instead of always breaking in one hit.
+- Durable bricks render extra damage pips so remaining strength is visible.
+- A dedicated piercing power-up spends charge on brick contact to destroy bricks without bouncing, overriding durability for those charged hits.
+- Brick layouts now bias toward mixed silhouettes instead of relying on rectangular blocks only.
+
+## Commercial Layer
+
+- The game now carries a persistent local player profile used for soft currency, best-score history, lifetime bricks destroyed, and other meta progression counters.
+- Commercial strategy and benchmark references live in `docs/commercialization_strategy.md` so product direction is versioned inside the repository.
+
+## Networking Layer
+
+- An ENet-based authoritative networking module now lives outside the single-player gameplay loop so LAN work can iterate without destabilizing the main game.
+- The host/server owns simulation and emits packed state snapshots at 25 Hz.
+- The client only transmits paddle input and renders interpolated snapshots, which matches the intended host-authoritative replication model.
+- Packet serialization uses packed wire structs plus `memcpy`, with explicit byte-order normalization for integers and floats.
+- The packet schema already stores arrays of paddles and scores so it can scale toward more players and future host-migration work.
 
 ## Extension Path
 

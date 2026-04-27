@@ -5,6 +5,204 @@
 
 #include "GameStyle.hpp"
 
+namespace
+{
+constexpr float kCollisionSlop = 0.01F;
+constexpr float kContactEpsilon = 0.0001F;
+constexpr float kPaddleRestitution = 1.0F;
+constexpr float kDirectionEpsilon = 0.001F;
+constexpr float kMinVerticalSpeedRatio = 0.48F;
+constexpr float kPaddleHorizontalTransfer = 0.42F;
+constexpr float kPaddleVerticalTransfer = 0.18F;
+
+float Dot(const game::Vec2& a, const game::Vec2& b)
+{
+    return a.x * b.x + a.y * b.y;
+}
+
+float LengthSquared(const game::Vec2& value)
+{
+    return Dot(value, value);
+}
+
+float SignOrDefault(float value, float fallback = 1.0F)
+{
+    if (value > 0.0F)
+    {
+        return 1.0F;
+    }
+
+    if (value < 0.0F)
+    {
+        return -1.0F;
+    }
+
+    return fallback >= 0.0F ? 1.0F : -1.0F;
+}
+
+game::Vec2 operator+(const game::Vec2& a, const game::Vec2& b)
+{
+    return game::Vec2 {a.x + b.x, a.y + b.y};
+}
+
+game::Vec2 operator-(const game::Vec2& a, const game::Vec2& b)
+{
+    return game::Vec2 {a.x - b.x, a.y - b.y};
+}
+
+game::Vec2 operator*(const game::Vec2& value, float scalar)
+{
+    return game::Vec2 {value.x * scalar, value.y * scalar};
+}
+
+game::Vec2 ClosestPointOnRect(const game::Vec2& point, const Rectangle& rect)
+{
+    return game::Vec2 {
+        std::clamp(point.x, rect.x, rect.x + rect.width),
+        std::clamp(point.y, rect.y, rect.y + rect.height),
+    };
+}
+
+game::Vec2 ResolveCircleRectNormal(const game::Ball& ball, const Rectangle& rect, float& penetration)
+{
+    const game::Vec2 closestPoint = ClosestPointOnRect(ball.position, rect);
+    const game::Vec2 offset = ball.position - closestPoint;
+    const float distanceSquared = LengthSquared(offset);
+
+    if (distanceSquared > kContactEpsilon)
+    {
+        const float distance = std::sqrt(distanceSquared);
+        penetration = ball.radius - distance;
+        return offset * (1.0F / distance);
+    }
+
+    const float distanceToLeft = ball.position.x - rect.x;
+    const float distanceToRight = rect.x + rect.width - ball.position.x;
+    const float distanceToTop = ball.position.y - rect.y;
+    const float distanceToBottom = rect.y + rect.height - ball.position.y;
+
+    penetration = ball.radius + distanceToLeft;
+    game::Vec2 normal {-1.0F, 0.0F};
+
+    if (distanceToRight < distanceToLeft)
+    {
+        penetration = ball.radius + distanceToRight;
+        normal = game::Vec2 {1.0F, 0.0F};
+    }
+
+    if (distanceToTop < std::min(distanceToLeft, distanceToRight))
+    {
+        penetration = ball.radius + distanceToTop;
+        normal = game::Vec2 {0.0F, -1.0F};
+    }
+
+    if (distanceToBottom < std::min({distanceToLeft, distanceToRight, distanceToTop}))
+    {
+        penetration = ball.radius + distanceToBottom;
+        normal = game::Vec2 {0.0F, 1.0F};
+    }
+
+    return normal;
+}
+
+void ConstrainBallTravelDirection(game::Ball& ball)
+{
+    const float speedSquared = LengthSquared(ball.velocity);
+    if (speedSquared <= kDirectionEpsilon)
+    {
+        return;
+    }
+
+    const float speed = std::sqrt(speedSquared);
+    const float absVerticalSpeed = std::abs(ball.velocity.y);
+    const float minVerticalSpeed = speed * kMinVerticalSpeedRatio;
+    if (absVerticalSpeed + kDirectionEpsilon >= minVerticalSpeed)
+    {
+        return;
+    }
+
+    const float constrainedVerticalSpeed = minVerticalSpeed;
+    const float constrainedHorizontalSpeed
+        = std::sqrt(std::max(speedSquared - constrainedVerticalSpeed * constrainedVerticalSpeed, 0.0F));
+
+    ball.velocity.x = constrainedHorizontalSpeed * SignOrDefault(ball.velocity.x);
+    ball.velocity.y = constrainedVerticalSpeed * SignOrDefault(ball.velocity.y, -1.0F);
+}
+
+int ChooseBrickDurability(int row)
+{
+    const int roll = GetRandomValue(0, 99);
+    const bool upperRows = row <= 2;
+    if ((upperRows && roll > 87) || roll > 95)
+    {
+        return 3;
+    }
+
+    if ((upperRows && roll > 58) || roll > 74)
+    {
+        return 2;
+    }
+
+    return 1;
+}
+
+int ChooseBrickShape(int durability)
+{
+    const int roll = GetRandomValue(0, 99);
+    if (durability >= 3)
+    {
+        return roll < 50 ? 4 : 5;
+    }
+
+    if (durability == 2)
+    {
+        if (roll < 18)
+        {
+            return 2;
+        }
+
+        if (roll < 45)
+        {
+            return 3;
+        }
+
+        if (roll < 73)
+        {
+            return 4;
+        }
+
+        return 5;
+    }
+
+    if (roll < 8)
+    {
+        return 0;
+    }
+
+    if (roll < 30)
+    {
+        return 1;
+    }
+
+    if (roll < 50)
+    {
+        return 2;
+    }
+
+    if (roll < 68)
+    {
+        return 3;
+    }
+
+    if (roll < 84)
+    {
+        return 4;
+    }
+
+    return 5;
+}
+} // namespace
+
 float Game::PaddleMinY() const
 {
     return std::clamp((float)screenHeight * 0.56F, HUD_HEIGHT + 22.0F, (float)screenHeight - 180.0F);
@@ -41,8 +239,9 @@ void Game::InitBricks()
                 break;
             }
 
-            const int shapeType = GetRandomValue(0, 3);
-            bricks.emplace_back(cursorX, y, width, height, shapeType);
+            const int durability = ChooseBrickDurability(row);
+            const int shapeType = ChooseBrickShape(durability);
+            bricks.emplace_back(cursorX, y, width, height, shapeType, durability);
 
             const float gap = (float)GetRandomValue(10, 26);
             const bool skipSegment = GetRandomValue(0, 100) < 15;
@@ -214,9 +413,8 @@ void Game::ApplyEffectPaddleToGameplay()
     paddle.SetRect(gameplayBounds);
 }
 
-void Game::HandleBalls(float paddleVel)
+void Game::HandleBalls(const game::Vec2& paddleVelocity, float deltaSeconds)
 {
-    const float deltaSeconds = std::max(GetFrameTime(), 0.0001F);
     const game::Rect playBounds {
         WALL_THICKNESS,
         WALL_THICKNESS,
@@ -234,8 +432,9 @@ void Game::HandleBalls(float paddleVel)
         }
 
         HandleBallEdgeCollision(managedBall);
-        HandleBallPaddleCollision(managedBall, paddleVel);
+        HandleBallPaddleCollision(managedBall, paddleVelocity);
         HandleBallBrickCollision(managedBall);
+        ConstrainBallTravelDirection(managedBall);
         particleSystem.spawnBallTrail(
             managedBall.position,
             managedBall.velocity,
@@ -248,12 +447,14 @@ void Game::HandleBalls(float paddleVel)
         if (!debugMode)
         {
             --lives;
+            ++playerProfile.totalBallLosses;
         }
 
         if (lives <= 0 && !debugMode)
         {
             currentState = GameState::GAMEOVER;
             powerUpSystem.clear(world);
+            FinalizeRunProgress();
         }
         else
         {
@@ -308,7 +509,7 @@ void Game::HandleBallEdgeCollision(game::Ball& managedBall)
     }
 }
 
-void Game::HandleBallPaddleCollision(game::Ball& managedBall, float paddleVel)
+void Game::HandleBallPaddleCollision(game::Ball& managedBall, const game::Vec2& paddleVelocity)
 {
     const Rectangle paddleRect = paddle.GetRect();
     if (!CheckCollisionCircleRec(game_style::toRayVec(managedBall.position), managedBall.radius, paddleRect))
@@ -316,17 +517,27 @@ void Game::HandleBallPaddleCollision(game::Ball& managedBall, float paddleVel)
         return;
     }
 
-    if (managedBall.velocity.y <= 0.0F)
+    float penetration = 0.0F;
+    const game::Vec2 collisionNormal = ResolveCircleRectNormal(managedBall, paddleRect, penetration);
+    if (penetration > 0.0F)
+    {
+        managedBall.position = managedBall.position + collisionNormal * (penetration + kCollisionSlop);
+    }
+
+    const game::Vec2 effectivePaddleVelocity {
+        paddleVelocity.x * kPaddleHorizontalTransfer,
+        paddleVelocity.y * kPaddleVerticalTransfer,
+    };
+    const game::Vec2 relativeVelocity = managedBall.velocity - effectivePaddleVelocity;
+    const float normalVelocity = Dot(relativeVelocity, collisionNormal);
+    if (normalVelocity >= 0.0F)
     {
         return;
     }
 
-    managedBall.position.y = paddleRect.y - managedBall.radius - 1.0F;
-    managedBall.velocity.y = -std::abs(managedBall.velocity.y);
-    managedBall.velocity.x += paddleVel * PADDLE_INFLUENCE * 60.0F;
-
-    const float maxHorizontalSpeed = MAX_H_SPEED * 60.0F;
-    managedBall.velocity.x = std::clamp(managedBall.velocity.x, -maxHorizontalSpeed, maxHorizontalSpeed);
+    const game::Vec2 reflectedRelativeVelocity
+        = relativeVelocity - collisionNormal * ((1.0F + kPaddleRestitution) * normalVelocity);
+    managedBall.velocity = reflectedRelativeVelocity + effectivePaddleVelocity;
 }
 
 void Game::HandleBallBrickCollision(game::Ball& managedBall)
@@ -350,37 +561,56 @@ void Game::HandleBallBrickCollision(game::Ball& managedBall)
             continue;
         }
 
-        const bool hitSide
-            = (managedBall.position.x < brickRect.x) || (managedBall.position.x > brickRect.x + brickRect.width);
-        const bool hitTopBottom
-            = (managedBall.position.y < brickRect.y) || (managedBall.position.y > brickRect.y + brickRect.height);
+        const bool usePierceCharge = pendingPierceCharges > 0;
+        const game::Vec2 burstOrigin {brickRect.x + brickRect.width / 2.0F, brickRect.y + brickRect.height / 2.0F};
 
-        if (hitSide && !hitTopBottom)
+        if (!usePierceCharge)
         {
-            managedBall.velocity.x = -managedBall.velocity.x;
-        }
-        else if (!hitSide && hitTopBottom)
-        {
-            managedBall.velocity.y = -managedBall.velocity.y;
-        }
-        else
-        {
-            managedBall.velocity.x = -managedBall.velocity.x;
-            managedBall.velocity.y = -managedBall.velocity.y;
+            float penetration = 0.0F;
+            const game::Vec2 collisionNormal = ResolveCircleRectNormal(managedBall, brickRect, penetration);
+            if (penetration > 0.0F)
+            {
+                managedBall.position = managedBall.position + collisionNormal * (penetration + kCollisionSlop);
+            }
+
+            const float normalVelocity = Dot(managedBall.velocity, collisionNormal);
+            if (normalVelocity < 0.0F)
+            {
+                managedBall.velocity = managedBall.velocity - collisionNormal * (2.0F * normalVelocity);
+            }
         }
 
-        brick.SetActive(false);
-        score += 100;
+        const int damage = usePierceCharge ? std::max(1, brick.HitPoints()) : 1;
+        const bool destroyed = brick.ApplyHit(damage);
+        score += destroyed ? 100 * brick.MaxHitPoints() : 45;
+        if (destroyed)
+        {
+            RegisterBrickDestroyed(brick.MaxHitPoints());
+        }
+
+        particleSystem.spawnBrickBurst(
+            burstOrigin,
+            destroyed ? powerUpConfigSet.particles.brickBurstCount : powerUpConfigSet.particles.brickBurstCount / 3U + 4U);
+
+        if (destroyed)
+        {
+            particleSystem.spawnBrickBurst(
+                burstOrigin,
+                powerUpConfigSet.particles.brickBurstCount / 3U + 6U);
+            MaybeSpawnPowerUpFromBrick(brickIndex, brickRect);
+        }
+
+        if (usePierceCharge)
+        {
+            pendingPierceCharges = std::max(0, pendingPierceCharges - 1);
+            if (pendingPierceCharges <= 0)
+            {
+                pendingPierceCharges = 0;
+            }
+            continue;
+        }
+
         managedBall.collisionResolvedThisFrame = true;
-
-        particleSystem.spawnBrickBurst(
-            game::Vec2 {brickRect.x + brickRect.width / 2.0F, brickRect.y + brickRect.height / 2.0F},
-            powerUpConfigSet.particles.brickBurstCount);
-        particleSystem.spawnBrickBurst(
-            game::Vec2 {brickRect.x + brickRect.width / 2.0F, brickRect.y + brickRect.height / 2.0F},
-            powerUpConfigSet.particles.brickBurstCount / 3U + 6U);
-
-        MaybeSpawnPowerUpFromBrick(brickIndex, brickRect);
         return;
     }
 }
@@ -413,6 +643,7 @@ void Game::CheckLevelProgress()
     }
 
     victory = true;
+    FinalizeRunProgress();
 }
 
 void Game::MaybeSpawnPowerUpFromBrick(std::size_t brickIndex, const Rectangle& brickRect)

@@ -1,8 +1,11 @@
 /.vs/
 /.vscode/
 /build/
+/build_vs/
 /out/
 /raylib/
 *.user
 *.suo
 *.pdb
+player_profile.json
+user_prefs.json

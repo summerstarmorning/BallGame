@@ -22,6 +22,8 @@ std::string toString(PowerUpType type)
         return "slow_ball";
     case PowerUpType::PaddleSpeed:
         return "paddle_speed";
+    case PowerUpType::PierceBall:
+        return "pierce_ball";
     }
 
     throw std::runtime_error("Unknown PowerUpType.");
@@ -47,6 +49,11 @@ PowerUpType powerUpTypeFromString(const std::string& value)
     if (value == "paddle_speed")
     {
         return PowerUpType::PaddleSpeed;
+    }
+
+    if (value == "pierce_ball")
+    {
+        return PowerUpType::PierceBall;
     }
 
     throw std::runtime_error("Unsupported power-up type: " + value);

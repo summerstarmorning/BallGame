@@ -59,6 +59,10 @@ void PowerUpSystem::update(float deltaSeconds, GameWorld& world, float offScreen
         if (world.paddle != nullptr && powerUp.checkPickup(*world.paddle))
         {
             powerUp.markCollected();
+            if (world.playerProfile != nullptr)
+            {
+                ++world.playerProfile->totalPowerUpsCollected;
+            }
             activate(powerUp.type(), world);
         }
     }

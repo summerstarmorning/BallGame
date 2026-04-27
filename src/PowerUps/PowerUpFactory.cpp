@@ -6,6 +6,7 @@
 #include "Effects/ExpandPaddleEffect.hpp"
 #include "Effects/MultiBallEffect.hpp"
 #include "Effects/PaddleSpeedEffect.hpp"
+#include "Effects/PierceBallEffect.hpp"
 #include "Effects/PowerUpEffect.hpp"
 #include "Effects/SlowBallEffect.hpp"
 
@@ -36,6 +37,12 @@ PowerUpFactory::PowerUpFactory()
         [](const PowerUpConfig& config)
         {
             return std::make_unique<PaddleSpeedEffect>(config);
+        });
+    registerCreator(
+        PowerUpType::PierceBall,
+        [](const PowerUpConfig& config)
+        {
+            return std::make_unique<PierceBallEffect>(config);
         });
 }
 
