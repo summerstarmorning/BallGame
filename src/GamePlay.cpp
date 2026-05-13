@@ -250,6 +250,25 @@ void Game::InitBricks()
     }
 
     AssignPowerUpsToBricks();
+    RebuildBrickSpatialGrid();
+}
+
+void Game::RebuildBrickSpatialGrid()
+{
+    brickCollisionRects.clear();
+    brickCollisionRects.reserve(bricks.size());
+    for (const Brick& brick : bricks)
+    {
+        brickCollisionRects.push_back(brick.GetRect());
+    }
+
+    brickCollisionCandidates.clear();
+    brickCollisionCandidates.reserve(std::min<std::size_t>(bricks.size(), 24U));
+    brickSpatialGrid.rebuild(
+        brickCollisionRects,
+        Rectangle {0.0F, HUD_HEIGHT, (float)screenWidth, (float)screenHeight - HUD_HEIGHT},
+        112.0F,
+        52.0F);
 }
 
 void Game::AssignPowerUpsToBricks()
@@ -547,7 +566,24 @@ void Game::HandleBallBrickCollision(game::Ball& managedBall)
         return;
     }
 
-    for (std::size_t brickIndex = 0; brickIndex < bricks.size(); ++brickIndex)
+    if (!brickSpatialGrid.empty())
+    {
+        brickSpatialGrid.queryCircle(
+            game_style::toRayVec(managedBall.position),
+            managedBall.radius,
+            brickCollisionCandidates);
+    }
+    else
+    {
+        brickCollisionCandidates.clear();
+        brickCollisionCandidates.reserve(bricks.size());
+        for (std::size_t brickIndex = 0; brickIndex < bricks.size(); ++brickIndex)
+        {
+            brickCollisionCandidates.push_back(brickIndex);
+        }
+    }
+
+    for (std::size_t brickIndex : brickCollisionCandidates)
     {
         Brick& brick = bricks[brickIndex];
         if (!brick.IsActive())

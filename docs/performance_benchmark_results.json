@@ -1,0 +1,70 @@
+{
+  "all_checksums_match": true,
+  "benchmark": "ballgame_brick_collision",
+  "results": [
+    {
+      "ball_count": 1,
+      "brick_count": 98,
+      "checksums_match": true,
+      "fps_gain_percent": 658.0097879282218,
+      "frames": 20000,
+      "naive": {
+        "avg_frame_ms": 0.00023233000000000002,
+        "checksum": 393865,
+        "equivalent_fps": 4304222.442215813,
+        "total_ms": 4.6466
+      },
+      "name": "standard_single_ball",
+      "spatial_grid": {
+        "avg_frame_ms": 3.065e-05,
+        "checksum": 393865,
+        "equivalent_fps": 32626427.406199023,
+        "total_ms": 0.613
+      },
+      "speedup_ratio": 7.580097879282219
+    },
+    {
+      "ball_count": 8,
+      "brick_count": 480,
+      "checksums_match": true,
+      "fps_gain_percent": 1611.0584620710545,
+      "frames": 12000,
+      "naive": {
+        "avg_frame_ms": 0.006590141666666666,
+        "checksum": 16901409,
+        "equivalent_fps": 151741.8062585908,
+        "total_ms": 79.0817
+      },
+      "name": "dense_multiball",
+      "spatial_grid": {
+        "avg_frame_ms": 0.00038515,
+        "checksum": 16901409,
+        "equivalent_fps": 2596391.016487083,
+        "total_ms": 4.6218
+      },
+      "speedup_ratio": 17.110584620710544
+    },
+    {
+      "ball_count": 14,
+      "brick_count": 864,
+      "checksums_match": true,
+      "fps_gain_percent": 2692.1333531003297,
+      "frames": 8000,
+      "naive": {
+        "avg_frame_ms": 0.018833637499999997,
+        "checksum": 39195857,
+        "equivalent_fps": 53096.48760097459,
+        "total_ms": 150.6691
+      },
+      "name": "extreme_multiball",
+      "spatial_grid": {
+        "avg_frame_ms": 0.000674525,
+        "checksum": 39195857,
+        "equivalent_fps": 1482524.7396315925,
+        "total_ms": 5.3962
+      },
+      "speedup_ratio": 27.921333531003295
+    }
+  ],
+  "timestamp_hint": "Generated locally from the same executable for before/after algorithm comparison"
+}

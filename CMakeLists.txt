@@ -66,6 +66,7 @@ add_executable(breakout_week2
     src/Ball.cpp
     src/Paddle.cpp
     src/Brick.cpp
+    src/Performance/BrickSpatialGrid.cpp
 )
 
 # --- Include directories for the project ---
@@ -104,6 +105,16 @@ target_include_directories(test_collision PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/i
 target_include_directories(test_collision PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/raylib/raylib-5.0_win64_msvc16/include")
 target_link_directories(test_collision PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/raylib/raylib-5.0_win64_msvc16/lib")
 target_link_libraries(test_collision PUBLIC raylib.lib winmm.lib)
+
+add_executable(collision_benchmark
+    src/perf/collision_benchmark.cpp
+    src/Performance/BrickSpatialGrid.cpp
+)
+
+target_include_directories(collision_benchmark PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(collision_benchmark PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/raylib/raylib-5.0_win64_msvc16/include")
+target_link_directories(collision_benchmark PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/raylib/raylib-5.0_win64_msvc16/lib")
+target_link_libraries(collision_benchmark PUBLIC raylib.lib winmm.lib)
 
 add_library(game_systems
     src/BallManager.cpp

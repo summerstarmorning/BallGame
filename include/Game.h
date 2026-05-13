@@ -14,6 +14,7 @@
 #include "Paddle.h"
 #include "Paddle.hpp"
 #include "Particles/ParticleSystem.hpp"
+#include "Performance/BrickSpatialGrid.hpp"
 #include "Profile/PlayerProfile.hpp"
 #include "PowerUps/PowerUpSystem.hpp"
 #include "raylib.h"
@@ -85,6 +86,9 @@ private:
     int currentLevel;
     std::vector<EdgeParticle> edgeParticles;
     std::vector<std::optional<game::PowerUpType>> brickPowerUps;
+    game::BrickSpatialGrid brickSpatialGrid;
+    std::vector<Rectangle> brickCollisionRects;
+    std::vector<std::size_t> brickCollisionCandidates;
     static constexpr int MAX_EDGE_PARTICLES = 600;
 
     game::BallManager ballManager;
@@ -116,6 +120,7 @@ private:
 
     void InitConfigAndBricks(const std::string& levelJsonFile);
     void InitBricks();
+    void RebuildBrickSpatialGrid();
     void AssignPowerUpsToBricks();
     void LoadPowerUpConfig();
     void LoadBackgroundTextures();

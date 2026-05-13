@@ -40,3 +40,12 @@
 - Applied a visible post-load result by refreshing the theme and brick color palette, which makes the assignment video easy to capture.
 - Added `docs/async_loading_module.md` to document the threading design, Raylib main-thread constraint, and the recommended recording flow.
 - Added a desktop Windows shortcut for directly launching the game build, with a keyboard hotkey for faster local demos.
+
+## 2026-05-13
+
+- Added a `BrickSpatialGrid` broad-phase helper and switched brick collision from full scans to spatial-grid candidate queries.
+- Preserved the old first-hit collision semantics by sorting grid candidates back into brick index order before narrow-phase collision.
+- Added a dedicated `collision_benchmark` executable plus `scripts/run_collision_benchmark.ps1` for automated before/after comparison.
+- Added `docs/performance_benchmark_results.json`, `docs/performance_optimization_report.md`, and `docs/performance_ai_dialogue.md` for the optimization assignment deliverables.
+- Added `scripts/generate_performance_chart.ps1` so the benchmark data can be rendered into a submission-friendly screenshot image.
+- Added `scripts/capture_window_screenshot.ps1` so a live game window can be captured into the submission folder without external tools.
