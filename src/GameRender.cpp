@@ -601,8 +601,12 @@ void Game::Draw()
         DrawRectangleRoundedLines(enterChip, 0.45F, 8, 1.3F, ColorAlpha(accentWarm, 0.56F));
         DrawDisplayText("PRESS ENTER", Vector2 {enterChip.x + 16.0F, enterChip.y + 9.0F}, 14.0F, 1.5F, accentWarm);
         DrawLocalized(
-            u8"\u6309 Enter \u7acb\u5373\u5f00\u5c40\uff0c\u7ee7\u7eed\u4f60\u7684\u4e0b\u4e00\u8f6e\u63a8\u8fdb",
-            "Press Enter to continue your next run",
+            hasResumeSave
+                ? u8"\u6309 C \u7ee7\u7eed\u5b58\u6863 \u6309 Enter \u6216 N \u91cd\u65b0\u5f00\u5c40"
+                : u8"\u6309 Enter \u7acb\u5373\u5f00\u5c40\uff0c\u7ee7\u7eed\u4f60\u7684\u4e0b\u4e00\u8f6e\u63a8\u8fdb",
+            hasResumeSave
+                ? "Press C to continue, or Enter / N to start fresh"
+                : "Press Enter to continue your next run",
             leftColumn.x + 28.0F,
             leftColumn.y + 258.0F,
             22.0F,
@@ -614,6 +618,21 @@ void Game::Draw()
             leftColumn.y + 286.0F,
             16.0F,
             ColorAlpha(accentWarm, 0.96F));
+
+        if (hasResumeSave)
+        {
+            const Rectangle continueChip {leftColumn.x + 226.0F, leftColumn.y + 212.0F, 230.0F, 34.0F};
+            DrawRectangleRounded(continueChip, 0.45F, 8, ColorAlpha(accentSuccess, 0.20F));
+            DrawRectangleRoundedLines(continueChip, 0.45F, 8, 1.3F, ColorAlpha(accentSuccess, 0.60F));
+            DrawDisplayText("PRESS C", Vector2 {continueChip.x + 16.0F, continueChip.y + 9.0F}, 14.0F, 1.5F, accentSuccess);
+            DrawLocalized(
+                u8"\u7ee7\u7eed\u5b58\u6863",
+                "CONTINUE",
+                continueChip.x + 90.0F,
+                continueChip.y + 7.0F,
+                15.0F,
+                ColorAlpha(textColor, 0.94F));
+        }
 
         const float cardY = leftColumn.y + leftColumn.height - 124.0F;
         const float cardGap = 12.0F;
@@ -903,5 +922,61 @@ void Game::Draw()
             ColorAlpha(textColor, 0.98F));
     }
 
+    if (editorModeActive && currentState == GameState::PLAYING)
+    {
+        const Rectangle editorChip {screenWidth * 0.5F - 360.0F, HUD_HEIGHT + 16.0F, 720.0F, 54.0F};
+        DrawGlassPanel(
+            editorChip,
+            ColorAlpha(accentWarm, 0.22F),
+            ColorAlpha(accentWarm, 0.78F),
+            ColorAlpha(accentWarm, 0.62F),
+            0.28F);
+        char editorMetric[64] {};
+        std::snprintf(editorMetric, sizeof(editorMetric), "shape %d  hp %d", editorShape, editorDurability);
+        DrawLocalized(
+            u8"\u7f16\u8f91\u6a21\u5f0f \u6309 E \u9000\u51fa \u5de6\u952e\u6dfb\u52a0 \u53f3\u952e\u5220\u9664 Ctrl+S \u4fdd\u5b58 1-6 \u5207\u5f62\u72b6 [ ] \u8c03\u8010\u4e45",
+            "Edit mode: E exit, left add, right delete, Ctrl+S save, 1-6 shape, [ ] hp",
+            editorChip.x + 16.0F,
+            editorChip.y + 10.0F,
+            18.0F,
+            ColorAlpha(textColor, 0.98F));
+        DrawDisplayText(editorMetric, Vector2 {editorChip.x + editorChip.width - 150.0F, editorChip.y + 26.0F}, 14.0F, 1.0F, accentWarm);
+    }
+
+    if (noticeTimer > 0.0F && !noticeZh.empty())
+    {
+        const Rectangle noticeChip {screenWidth * 0.5F - 330.0F, 22.0F, 660.0F, 42.0F};
+        DrawGlassPanel(
+            noticeChip,
+            ColorAlpha(accentWarm, 0.24F),
+            ColorAlpha(accentWarm, 0.80F),
+            ColorAlpha(accentWarm, 0.62F),
+            0.28F);
+        DrawLocalized(
+            noticeZh.c_str(),
+            noticeEn.c_str(),
+            noticeChip.x + 16.0F,
+            noticeChip.y + 11.0F,
+            18.0F,
+            ColorAlpha(textColor, 0.98F));
+    }
+
     EndDrawing();
+
+    if (captureFramesEnabled)
+    {
+        const bool shouldCapture = (captureFrameIndex % std::max(captureFrameStride, 1)) == 0;
+        if (shouldCapture)
+        {
+            char capturePath[512] {};
+            std::snprintf(
+                capturePath,
+                sizeof(capturePath),
+                "%s\\frame_%05d.png",
+                captureFrameDir.c_str(),
+                captureFrameIndex / std::max(captureFrameStride, 1) + 1);
+            TakeScreenshot(capturePath);
+        }
+        ++captureFrameIndex;
+    }
 }

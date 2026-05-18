@@ -17,6 +17,7 @@ using json = nlohmann::json;
 
 namespace
 {
+constexpr const char* kRunSavePath = "save/run_save.json";
 void writeUserPrefsFile(bool isDarkMode, int ballColorIndex, int paddleColorIndex, int brickColorIndex)
 {
     json prefs;
@@ -112,6 +113,16 @@ std::vector<int> buildUiFontCodepoints()
         u8"\u5f53\u524d\u8fdb\u5ea6",
         u8"\u8d44\u6e90\u70ed\u52a0\u8f7d",
         u8"\u52a0\u8f7d\u671f\u95f4\u4ecd\u53ef\u7ee7\u7eed\u6e32\u67d3\u548c\u64cd\u4f5c",
+        u8"\u68c0\u6d4b\u5230\u4e0a\u6b21\u8fd0\u884c\u5b58\u6863",
+        u8"\u6309 C \u7ee7\u7eed\u4ece\u5b58\u6863\u5173\u5361\u5f00\u59cb \u6309 Enter \u6216 N \u65b0\u5f00\u4e00\u5c40",
+        u8"\u7ee7\u7eed\u5b58\u6863",
+        u8"\u65b0\u5f00\u4e00\u5c40",
+        u8"\u7f16\u8f91\u6a21\u5f0f",
+        u8"\u6309 E \u9000\u51fa\u7f16\u8f91 \u5de6\u952e\u6dfb\u52a0 \u53f3\u952e\u5220\u9664 Ctrl+S \u4fdd\u5b58 1-6 \u5207\u5f62\u72b6 [ ] \u8c03\u8010\u4e45",
+        u8"\u5df2\u4fdd\u5b58\u5f53\u524d\u5173\u5361\u5e03\u5c40",
+        u8"\u5173\u5361 JSON \u7f3a\u5931\u6216\u683c\u5f0f\u9519\u8bef \u5df2\u56de\u9000\u5230\u9ed8\u8ba4\u5e03\u5c40",
+        u8"\u5b58\u6863\u5df2\u4ece\u65e7\u7248\u683c\u5f0f\u8fc1\u79fb\u5230\u65b0\u7248",
+        u8"\u5b58\u6863\u635f\u574f\u6216\u8bfb\u53d6\u5931\u8d25 \u5df2\u5ffd\u7565",
     };
 
     for (const char* sample : zhSamples)
@@ -211,7 +222,14 @@ std::vector<std::string> collectImagePaths(const std::string& folderPath)
 }
 } // namespace
 
-Game::Game(int width, int height)
+Game::Game(
+    int width,
+    int height,
+    bool autoStart,
+    bool autoContinue,
+    int autoExitLevel,
+    float autoExitHoldSeconds,
+    std::string frameCaptureDir)
     : screenWidth(width)
     , screenHeight(height)
     , paddle((float)width / 2.0F - 75.0F, (float)height - 68.0F, 150.0F, 25.0F)
@@ -241,7 +259,24 @@ Game::Game(int width, int height)
     , profileSaveAccumulator(0.0F)
     , hasUiFont(false)
     , hasDisplayFont(false)
+    , bootAutoStart(autoStart)
+    , bootAutoContinue(autoContinue)
+    , demoExitLevel(autoExitLevel)
+    , demoExitHoldSeconds(autoExitHoldSeconds)
+    , demoExitElapsed(0.0F)
+    , captureFrameDir(std::move(frameCaptureDir))
+    , captureFramesEnabled(false)
+    , captureFrameIndex(0)
+    , captureFrameStride(4)
 {
+    if (!captureFrameDir.empty())
+    {
+        namespace fs = std::filesystem;
+        std::error_code ec;
+        fs::create_directories(this->captureFrameDir, ec);
+        captureFramesEnabled = !ec;
+    }
+
     std::ifstream prefsFile("user_prefs.json");
     if (prefsFile.is_open())
     {
@@ -302,15 +337,25 @@ Game::Game(int width, int height)
     LoadPlayerProfile();
     LoadBackgroundTextures();
     currentLevel = 1;
-    InitConfigAndBricks(game_style::levelConfigs().front());
+    LoadLevelForCurrentStage();
     ResetBalls();
     const Rectangle initialPaddleRect = paddle.GetRect();
     prevPaddlePosition = Vector2 {initialPaddleRect.x, initialPaddleRect.y};
+    RefreshResumeSaveState();
+    if (bootAutoContinue && hasResumeSave)
+    {
+        (void)ContinueSavedRun();
+    }
+    else if (bootAutoStart)
+    {
+        StartNewRun();
+    }
 }
 
 Game::~Game()
 {
     JoinAsyncLoadThread();
+    SaveRuntimeProgress();
     SavePlayerProfile();
     UnloadBackgroundTextures();
     if (hasUiFont && uiFont.texture.id != 0)
@@ -337,6 +382,286 @@ void Game::SavePlayerProfile()
     playerProfile.bestScore = std::max(playerProfile.bestScore, score);
     playerProfile.highestStage = std::max(playerProfile.highestStage, currentLevel);
     (void)game::PlayerProfileStore::save("player_profile.json", playerProfile);
+}
+
+void Game::SaveRuntimeProgress()
+{
+    if (currentState != GameState::PLAYING && currentState != GameState::PAUSED)
+    {
+        return;
+    }
+
+    game::RunSaveState saveState;
+    saveState.version = game::RunSaveState::CURRENT_VERSION;
+    saveState.currentLevel = std::max(1, currentLevel);
+    saveState.score = std::max(0, score);
+    saveState.lives = std::max(1, lives);
+    saveState.hasData = true;
+
+    std::string errorMessage;
+    if (!game::RunSaveStore::save(kRunSavePath, saveState, &errorMessage))
+    {
+        ShowNotice(u8"\u8fd0\u884c\u5b58\u6863\u4fdd\u5b58\u5931\u8d25", "Failed to save run progress", 4.0F);
+        return;
+    }
+
+    hasResumeSave = true;
+    resumeSaveState = saveState;
+}
+
+void Game::ClearRuntimeSave()
+{
+    std::string errorMessage;
+    if (!game::RunSaveStore::remove(kRunSavePath, &errorMessage))
+    {
+        ShowNotice(u8"\u8fd0\u884c\u5b58\u6863\u5220\u9664\u5931\u8d25", "Failed to remove run save", 4.0F);
+    }
+    hasResumeSave = false;
+    continuePromptVisible = false;
+    resumeSaveState = game::RunSaveState {};
+}
+
+void Game::RefreshResumeSaveState()
+{
+    const game::RunSaveLoadResult loadResult = game::RunSaveStore::load(kRunSavePath);
+    if (!loadResult.exists)
+    {
+        hasResumeSave = false;
+        continuePromptVisible = false;
+        resumeSaveState = game::RunSaveState {};
+        return;
+    }
+
+    if (!loadResult.loaded)
+    {
+        hasResumeSave = false;
+        continuePromptVisible = false;
+        resumeSaveState = game::RunSaveState {};
+        ShowNotice(
+            u8"\u5b58\u6863\u635f\u574f\u6216\u8bfb\u53d6\u5931\u8d25 \u5df2\u5ffd\u7565",
+            "Save file was invalid and has been ignored",
+            5.2F);
+        return;
+    }
+
+    resumeSaveState = loadResult.state;
+    hasResumeSave = loadResult.state.hasData;
+    continuePromptVisible = hasResumeSave;
+    if (loadResult.migrated)
+    {
+        std::string errorMessage;
+        (void)game::RunSaveStore::save(kRunSavePath, resumeSaveState, &errorMessage);
+        ShowNotice(
+            u8"\u5b58\u6863\u5df2\u4ece\u65e7\u7248\u683c\u5f0f\u8fc1\u79fb\u5230\u65b0\u7248",
+            "Legacy save migrated to v2 format",
+            5.0F);
+    }
+}
+
+void Game::ShowNotice(const char* zhText, const char* enText, float seconds)
+{
+    noticeZh = zhText == nullptr ? "" : zhText;
+    noticeEn = enText == nullptr ? "" : enText;
+    noticeTimer = std::max(seconds, 0.0F);
+}
+
+void Game::StartNewRun()
+{
+    currentState = GameState::PLAYING;
+    victory = false;
+    editorModeActive = false;
+    demoExitElapsed = 0.0F;
+    score = 0;
+    currentLevel = 1;
+    powerUpSystem.clear(world);
+    edgeParticles.clear();
+    particleSystem.clear();
+    pendingPierceCharges = 0;
+    ++playerProfile.totalRuns;
+
+    ClearRuntimeSave();
+    LoadLevelForCurrentStage();
+    lives = levelStartLives;
+    ResetBalls();
+    const Rectangle resetPaddleRect = paddle.GetRect();
+    prevPaddlePosition = Vector2 {resetPaddleRect.x, resetPaddleRect.y};
+    SaveRuntimeProgress();
+    SavePlayerProfile();
+    writeUserPrefsFile(isDarkMode, ballColorIndex, paddleColorIndex, brickColorIndex);
+}
+
+bool Game::ContinueSavedRun()
+{
+    if (!hasResumeSave)
+    {
+        return false;
+    }
+
+    currentState = GameState::PLAYING;
+    victory = false;
+    editorModeActive = false;
+    demoExitElapsed = 0.0F;
+    score = std::max(0, resumeSaveState.score);
+    currentLevel = std::clamp(resumeSaveState.currentLevel, 1, (int)game_style::levelConfigs().size());
+    powerUpSystem.clear(world);
+    edgeParticles.clear();
+    particleSystem.clear();
+    pendingPierceCharges = 0;
+
+    LoadLevelForCurrentStage();
+    lives = std::max(1, resumeSaveState.lives);
+    ResetBalls();
+    const Rectangle resetPaddleRect = paddle.GetRect();
+    prevPaddlePosition = Vector2 {resetPaddleRect.x, resetPaddleRect.y};
+    continuePromptVisible = false;
+    SaveRuntimeProgress();
+    return true;
+}
+
+bool Game::LoadLevelForCurrentStage()
+{
+    const auto& levels = game_style::levelConfigs();
+    if (levels.empty())
+    {
+        return false;
+    }
+
+    const std::size_t levelIndex = (std::size_t)std::clamp(currentLevel - 1, 0, (int)levels.size() - 1);
+    currentLevelPath = levels[levelIndex];
+    InitConfigAndBricks(currentLevelPath);
+    return true;
+}
+
+void Game::ToggleEditorMode()
+{
+    if (currentState != GameState::PLAYING)
+    {
+        return;
+    }
+
+    editorModeActive = !editorModeActive;
+    if (editorModeActive)
+    {
+        ShowNotice(
+            u8"\u7f16\u8f91\u6a21\u5f0f\u5df2\u5f00\u542f",
+            "Edit mode enabled",
+            3.0F);
+    }
+    else
+    {
+        ShowNotice(
+            u8"\u7f16\u8f91\u6a21\u5f0f\u5df2\u5173\u95ed",
+            "Edit mode disabled",
+            2.8F);
+    }
+}
+
+void Game::HandleEditorInput()
+{
+    if (!editorModeActive)
+    {
+        return;
+    }
+
+    if (IsKeyPressed(KEY_ONE)) editorShape = 0;
+    if (IsKeyPressed(KEY_TWO)) editorShape = 1;
+    if (IsKeyPressed(KEY_THREE)) editorShape = 2;
+    if (IsKeyPressed(KEY_FOUR)) editorShape = 3;
+    if (IsKeyPressed(KEY_FIVE)) editorShape = 4;
+    if (IsKeyPressed(KEY_SIX)) editorShape = 5;
+    if (IsKeyPressed(KEY_LEFT_BRACKET))
+    {
+        editorDurability = std::max(1, editorDurability - 1);
+    }
+    if (IsKeyPressed(KEY_RIGHT_BRACKET))
+    {
+        editorDurability = std::min(5, editorDurability + 1);
+    }
+
+    const bool savePressed = IsKeyPressed(KEY_S)
+        && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL));
+    if (savePressed)
+    {
+        SaveCurrentLevelLayout();
+    }
+
+    const Vector2 mousePos = GetMousePosition();
+    const float snappedX = std::round((mousePos.x - 52.0F) / editorBrickWidth) * editorBrickWidth + 52.0F;
+    const float snappedY = std::round((mousePos.y - 132.0F) / editorBrickHeight) * editorBrickHeight + 132.0F;
+    const Rectangle snappedRect {snappedX, snappedY, editorBrickWidth - 8.0F, editorBrickHeight - 8.0F};
+
+    auto hitIt = std::find_if(
+        bricks.begin(),
+        bricks.end(),
+        [mousePos](const Brick& brick)
+        {
+            return brick.IsActive() && CheckCollisionPointRec(mousePos, brick.GetRect());
+        });
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && hitIt != bricks.end())
+    {
+        const std::size_t index = (std::size_t)std::distance(bricks.begin(), hitIt);
+        bricks.erase(hitIt);
+        if (index < brickPowerUps.size())
+        {
+            brickPowerUps.erase(brickPowerUps.begin() + (long long)index);
+        }
+        RebuildBrickSpatialGrid();
+        return;
+    }
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && hitIt == bricks.end())
+    {
+        bricks.emplace_back(
+            snappedRect.x,
+            snappedRect.y,
+            snappedRect.width,
+            snappedRect.height,
+            editorShape,
+            editorDurability);
+        brickPowerUps.push_back(std::nullopt);
+        RebuildBrickSpatialGrid();
+    }
+}
+
+void Game::SaveCurrentLevelLayout()
+{
+    game::LevelData snapshot = currentLevelData;
+    snapshot.bricks.clear();
+    for (const Brick& brick : bricks)
+    {
+        if (!brick.IsActive())
+        {
+            continue;
+        }
+
+        const Rectangle rect = brick.GetRect();
+        snapshot.bricks.push_back(game::BrickRecord {
+            rect.x,
+            rect.y,
+            rect.width,
+            rect.height,
+            brick.GetShape(),
+            brick.MaxHitPoints(),
+        });
+    }
+
+    std::string errorMessage;
+    if (levelLoader.saveToFile(currentLevelPath, snapshot, &errorMessage))
+    {
+        currentLevelData = snapshot;
+        ShowNotice(
+            u8"\u5df2\u4fdd\u5b58\u5f53\u524d\u5173\u5361\u5e03\u5c40",
+            "Current level layout saved",
+            3.4F);
+    }
+    else
+    {
+        ShowNotice(
+            u8"\u5173\u5361 JSON \u4fdd\u5b58\u5931\u8d25",
+            "Failed to save level JSON",
+            4.4F);
+    }
 }
 
 void Game::RegisterBrickDestroyed(int durability)
@@ -456,72 +781,35 @@ void Game::PollAsyncLoadDemo(float deltaSeconds)
 
 void Game::InitConfigAndBricks(const std::string& levelJsonFile)
 {
+    const game::LevelData levelData = levelLoader.loadFromFile(levelJsonFile, currentLevel, screenWidth, screenHeight);
+    ApplyLevelData(levelData);
+    if (levelData.usedFallback)
+    {
+        ShowNotice(
+            u8"\u5173\u5361 JSON \u7f3a\u5931\u6216\u683c\u5f0f\u9519\u8bef \u5df2\u56de\u9000\u5230\u9ed8\u8ba4\u5e03\u5c40",
+            "Level JSON missing or invalid, fallback layout used",
+            5.4F);
+    }
+}
+
+void Game::ApplyLevelData(const game::LevelData& levelData)
+{
+    currentLevelData = levelData;
     bricks.clear();
     edgeParticles.clear();
 
-    int configuredLives = 3;
-    Vector2 configuredBallPos {(float)screenWidth / 2.0F, (float)screenHeight / 2.0F};
-    Vector2 configuredBallSpeed {4.0F, 4.0F};
-    float configuredBallRadius = 15.0F;
-    Rectangle configuredPaddle {
-        (float)screenWidth / 2.0F - 75.0F,
-        (float)screenHeight - 68.0F,
-        150.0F,
-        25.0F,
-    };
-
-    std::ifstream input(levelJsonFile);
-    if (input.is_open())
-    {
-        try
-        {
-            const json data = json::parse(input, nullptr, true, true);
-
-            if (data.contains("game") && data["game"].is_object())
-            {
-                configuredLives = data["game"].value("lives", configuredLives);
-            }
-
-            if (data.contains("ball") && data["ball"].is_object())
-            {
-                configuredBallPos.x = data["ball"].value("startX", configuredBallPos.x);
-                configuredBallPos.y = data["ball"].value("startY", configuredBallPos.y);
-                configuredBallSpeed.x = data["ball"].value("speedX", configuredBallSpeed.x);
-                configuredBallSpeed.y = data["ball"].value("speedY", configuredBallSpeed.y);
-                configuredBallRadius = data["ball"].value("radius", configuredBallRadius);
-            }
-
-            if (data.contains("paddle") && data["paddle"].is_object())
-            {
-                configuredPaddle.x = data["paddle"].value("startX", configuredPaddle.x);
-                configuredPaddle.y = data["paddle"].value("startY", configuredPaddle.y);
-                configuredPaddle.width = data["paddle"].value("width", configuredPaddle.width);
-                configuredPaddle.height = data["paddle"].value("height", configuredPaddle.height);
-            }
-        }
-        catch (const json::parse_error& error)
-        {
-            std::cerr << "JSON parse error: " << error.what() << std::endl;
-        }
-    }
-    else
-    {
-        std::cerr << "Could not open level config file: " << levelJsonFile << std::endl;
-    }
-
-    levelStartLives = configuredLives;
-    if (currentState == GameState::MENU || currentState == GameState::GAMEOVER)
-    {
-        lives = levelStartLives;
-    }
-
-    paddle = Paddle(configuredPaddle.x, configuredPaddle.y, configuredPaddle.width, configuredPaddle.height);
-    effectPaddle = std::make_unique<game::Paddle>(game_style::toGameRect(configuredPaddle));
+    levelStartLives = std::max(1, levelData.lives);
+    paddle = Paddle(
+        levelData.paddleStart.x,
+        levelData.paddleStart.y,
+        levelData.paddleStart.width,
+        levelData.paddleStart.height);
+    effectPaddle = std::make_unique<game::Paddle>(game_style::toGameRect(levelData.paddleStart));
     world.paddle = effectPaddle.get();
 
-    spawnBallPosition = configuredBallPos;
-    spawnBallVelocity = Vector2 {configuredBallSpeed.x * 60.0F, configuredBallSpeed.y * 60.0F};
-    spawnBallRadius = std::clamp(configuredBallRadius * 1.35F, 18.0F, 28.0F);
+    spawnBallPosition = levelData.ballStart;
+    spawnBallVelocity = Vector2 {levelData.ballSpeed.x * 60.0F, levelData.ballSpeed.y * 60.0F};
+    spawnBallRadius = std::clamp(levelData.ballRadius * 1.35F, 18.0F, 28.0F);
     paddleSpeedMultiplier = 1.0F;
 
     InitBricks();
@@ -742,6 +1030,7 @@ void Game::HandleInput()
     const Vector2 mousePos = GetMousePosition();
     if (IsKeyPressed(KEY_Q))
     {
+        SaveRuntimeProgress();
         exitWindowRequest = true;
     }
 
@@ -753,6 +1042,11 @@ void Game::HandleInput()
     if (currentState != GameState::PAUSED && IsKeyPressed(KEY_L))
     {
         StartAsyncLoadDemo();
+    }
+
+    if (IsKeyPressed(KEY_E) && currentState == GameState::PLAYING && !victory)
+    {
+        ToggleEditorMode();
     }
 
     if (currentState == GameState::MENU)
@@ -784,28 +1078,24 @@ void Game::HandleInput()
         paddleColor = palette[(std::size_t)paddleColorIndex % palette.size()];
         brickColor = palette[(std::size_t)brickColorIndex % palette.size()];
 
-        if (IsKeyPressed(KEY_ENTER) && !asyncLoadActive)
+        if (!asyncLoadActive && hasResumeSave && (IsKeyPressed(KEY_C)))
         {
-            currentState = GameState::PLAYING;
-            victory = false;
-            score = 0;
-            currentLevel = 1;
-            lives = levelStartLives;
-            powerUpSystem.clear(world);
-            edgeParticles.clear();
-            particleSystem.clear();
-            pendingPierceCharges = 0;
-            ++playerProfile.totalRuns;
-            InitConfigAndBricks(game_style::levelConfigs().front());
-            ResetBalls();
-            const Rectangle resetPaddleRect = paddle.GetRect();
-            prevPaddlePosition = Vector2 {resetPaddleRect.x, resetPaddleRect.y};
-            SavePlayerProfile();
-            writeUserPrefsFile(isDarkMode, ballColorIndex, paddleColorIndex, brickColorIndex);
+            (void)ContinueSavedRun();
+        }
+
+        if (!asyncLoadActive && (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_N)))
+        {
+            StartNewRun();
         }
     }
     else if (currentState == GameState::PLAYING)
     {
+        if (editorModeActive)
+        {
+            HandleEditorInput();
+            return;
+        }
+
         const Rectangle pauseBtn = game_style::pauseButtonRect(screenWidth, PAUSE_BUTTON_SIZE);
         if (IsKeyPressed(KEY_P))
         {
@@ -861,11 +1151,31 @@ void Game::Update()
 {
     const float deltaSeconds = std::max(GetFrameTime(), 0.0001F);
     PollAsyncLoadDemo(deltaSeconds);
+    if (noticeTimer > 0.0F)
+    {
+        noticeTimer = std::max(0.0F, noticeTimer - deltaSeconds);
+    }
 
-    if (currentState != GameState::PLAYING || victory)
+    if (currentState != GameState::PLAYING || victory || editorModeActive)
     {
         UpdateEdgeParticles();
         return;
+    }
+
+    if (demoExitLevel > 0 && currentLevel >= demoExitLevel)
+    {
+        demoExitElapsed += deltaSeconds;
+        if (demoExitElapsed >= std::max(demoExitHoldSeconds, 0.8F))
+        {
+            SaveRuntimeProgress();
+            exitWindowRequest = true;
+            UpdateEdgeParticles();
+            return;
+        }
+    }
+    else
+    {
+        demoExitElapsed = 0.0F;
     }
 
     profileSaveAccumulator += deltaSeconds;
@@ -874,6 +1184,7 @@ void Game::Update()
         playerProfile.totalPlaySeconds += (int)profileSaveAccumulator;
         profileSaveAccumulator = 0.0F;
         SavePlayerProfile();
+        SaveRuntimeProgress();
     }
 
     const Rectangle paddleRect = paddle.GetRect();

@@ -49,3 +49,12 @@
 - Added `docs/performance_benchmark_results.json`, `docs/performance_optimization_report.md`, and `docs/performance_ai_dialogue.md` for the optimization assignment deliverables.
 - Added `scripts/generate_performance_chart.ps1` so the benchmark data can be rendered into a submission-friendly screenshot image.
 - Added `scripts/capture_window_screenshot.ps1` so a live game window can be captured into the submission folder without external tools.
+
+## 2026-05-18
+
+- Replaced hardcoded brick generation with JSON-driven level loading and added three shipped layouts under `config/levels/`.
+- Added `LevelLoader` fallback handling so missing or malformed level JSON now switches to a generated default layout with an in-game notice.
+- Added runtime run-save persistence for `currentLevel`, `score`, and `lives`, plus boot-time continue detection in the main menu.
+- Added v1-to-v2 save migration so older save files can be upgraded automatically when loaded.
+- Added optional gameplay edit mode with `E`, mouse add/remove, shape switching, durability tuning, and `Ctrl+S` JSON export.
+- Added `docs/level_save_system.md`, `docs/level_save_ai_dialogue.md`, and automated PowerShell scripts for recording and submission packaging.

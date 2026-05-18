@@ -90,6 +90,9 @@ file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config.json" DESTINATION "${CMAKE_CURRENT
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config2.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config2.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config2.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/config" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Debug")
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/Release")
@@ -120,10 +123,12 @@ add_library(game_systems
     src/BallManager.cpp
     src/Config/PowerUpConfigLoader.cpp
     src/Effects/ExpandPaddleEffect.cpp
+    src/Level/LevelLoader.cpp
     src/Effects/MultiBallEffect.cpp
     src/Effects/PaddleSpeedEffect.cpp
     src/Effects/PierceBallEffect.cpp
     src/Effects/PowerUpEffect.cpp
+    src/Save/RunSaveStore.cpp
     src/Effects/SlowBallEffect.cpp
     src/Particles/ParticleSystem.cpp
     src/Profile/PlayerProfile.cpp
@@ -133,6 +138,7 @@ add_library(game_systems
 )
 
 target_include_directories(game_systems PUBLIC include)
+target_include_directories(game_systems PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/raylib/raylib-5.0_win64_msvc16/include")
 target_link_libraries(breakout_week2 PRIVATE game_systems)
 
 add_library(game_networking

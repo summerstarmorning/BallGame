@@ -24,9 +24,13 @@ inline const std::array<Color, 8>& colorPalette()
     return palette;
 }
 
-inline const std::array<const char*, 2>& levelConfigs()
+inline const std::array<const char*, 3>& levelConfigs()
 {
-    static const std::array<const char*, 2> levels {"config.json", "config2.json"};
+    static const std::array<const char*, 3> levels {
+        "config/levels/level1.json",
+        "config/levels/level2.json",
+        "config/levels/level3.json",
+    };
     return levels;
 }
 

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <vector>
 
 #include "GameStyle.hpp"
 
@@ -216,37 +217,15 @@ float Game::PaddleMaxY() const
 void Game::InitBricks()
 {
     bricks.clear();
-
-    const float sidePadding = 52.0F;
-    const float topStart = HUD_HEIGHT + 56.0F;
-    constexpr int rows = 7;
-    constexpr float rowGap = 44.0F;
-    const float rightLimit = (float)screenWidth - sidePadding;
-
-    for (int row = 0; row < rows; ++row)
+    for (const game::BrickRecord& brick : currentLevelData.bricks)
     {
-        float cursorX = sidePadding + (float)GetRandomValue(-18, 16);
-        const float rowBaseY = topStart + (float)row * rowGap + (float)GetRandomValue(-6, 8);
+        bricks.emplace_back(brick.x, brick.y, brick.width, brick.height, brick.shape, brick.durability);
+    }
 
-        while (cursorX < rightLimit - 72.0F)
-        {
-            const float width = (float)GetRandomValue(62, 168);
-            const float height = (float)GetRandomValue(20, 36);
-            const float y = rowBaseY + (float)GetRandomValue(-6, 6);
-
-            if (cursorX + width > rightLimit)
-            {
-                break;
-            }
-
-            const int durability = ChooseBrickDurability(row);
-            const int shapeType = ChooseBrickShape(durability);
-            bricks.emplace_back(cursorX, y, width, height, shapeType, durability);
-
-            const float gap = (float)GetRandomValue(10, 26);
-            const bool skipSegment = GetRandomValue(0, 100) < 15;
-            cursorX += width + gap + (skipSegment ? (float)GetRandomValue(24, 66) : 0.0F);
-        }
+    if (!currentLevelData.bricks.empty())
+    {
+        editorBrickWidth = currentLevelData.bricks.front().width + 8.0F;
+        editorBrickHeight = currentLevelData.bricks.front().height + 8.0F;
     }
 
     AssignPowerUpsToBricks();
@@ -349,16 +328,25 @@ void Game::AssignPowerUpsToBricks()
         {
             return value.has_value() && *value == game::PowerUpType::MultiBall;
         });
-    while (multiBallCount < 3)
+    const int targetMultiBallCount = std::min<int>(3, (int)brickPowerUps.size());
+    std::vector<std::size_t> multiBallCandidates;
+    multiBallCandidates.reserve(brickPowerUps.size());
+    for (std::size_t index = 0; index < brickPowerUps.size(); ++index)
     {
-        const std::size_t forcedIndex = (std::size_t)GetRandomValue(0, (int)brickPowerUps.size() - 1);
-        if (brickPowerUps[forcedIndex].has_value() && *brickPowerUps[forcedIndex] == game::PowerUpType::MultiBall)
+        if (brickPowerUps[index].has_value() && *brickPowerUps[index] == game::PowerUpType::MultiBall)
         {
             continue;
         }
+        multiBallCandidates.push_back(index);
+    }
 
+    while (multiBallCount < targetMultiBallCount && !multiBallCandidates.empty())
+    {
+        const int pick = GetRandomValue(0, (int)multiBallCandidates.size() - 1);
+        const std::size_t forcedIndex = multiBallCandidates[(std::size_t)pick];
         brickPowerUps[forcedIndex] = game::PowerUpType::MultiBall;
         ++multiBallCount;
+        multiBallCandidates.erase(multiBallCandidates.begin() + pick);
     }
 }
 
@@ -474,11 +462,13 @@ void Game::HandleBalls(const game::Vec2& paddleVelocity, float deltaSeconds)
             currentState = GameState::GAMEOVER;
             powerUpSystem.clear(world);
             FinalizeRunProgress();
+            ClearRuntimeSave();
         }
         else
         {
             powerUpSystem.onLevelTransition(world, true);
             ResetBalls();
+            SaveRuntimeProgress();
         }
     }
 
@@ -672,14 +662,16 @@ void Game::CheckLevelProgress()
         ++currentLevel;
         particleSystem.clear();
         edgeParticles.clear();
-        InitConfigAndBricks(levels[(std::size_t)currentLevel - 1U]);
+        LoadLevelForCurrentStage();
         powerUpSystem.onLevelTransition(world, true);
         ResetBalls();
+        SaveRuntimeProgress();
         return;
     }
 
     victory = true;
     FinalizeRunProgress();
+    ClearRuntimeSave();
 }
 
 void Game::MaybeSpawnPowerUpFromBrick(std::size_t brickIndex, const Rectangle& brickRect)

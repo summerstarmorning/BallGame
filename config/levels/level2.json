@@ -1,0 +1,42 @@
+{
+    "version": 1,
+    "name": "Cross Current",
+    "game": {
+        "lives": 3
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 520.0,
+        "speedX": 4.6,
+        "speedY": -6.0,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 720.0,
+        "startY": 860.0,
+        "width": 142.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 300.0, "y": 170.0, "width": 120.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 438.0, "y": 170.0, "width": 120.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 576.0, "y": 170.0, "width": 120.0, "height": 28.0, "shape": 3, "durability": 2 },
+        { "x": 714.0, "y": 170.0, "width": 120.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 852.0, "y": 170.0, "width": 120.0, "height": 28.0, "shape": 5, "durability": 2 },
+        { "x": 990.0, "y": 170.0, "width": 120.0, "height": 28.0, "shape": 1, "durability": 1 },
+
+        { "x": 438.0, "y": 222.0, "width": 120.0, "height": 28.0, "shape": 4, "durability": 2 },
+        { "x": 576.0, "y": 222.0, "width": 120.0, "height": 28.0, "shape": 5, "durability": 3 },
+        { "x": 714.0, "y": 222.0, "width": 120.0, "height": 28.0, "shape": 4, "durability": 2 },
+        { "x": 576.0, "y": 274.0, "width": 120.0, "height": 28.0, "shape": 2, "durability": 2 },
+
+        { "x": 300.0, "y": 326.0, "width": 120.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 438.0, "y": 326.0, "width": 120.0, "height": 28.0, "shape": 3, "durability": 2 },
+        { "x": 576.0, "y": 326.0, "width": 120.0, "height": 28.0, "shape": 0, "durability": 3 },
+        { "x": 714.0, "y": 326.0, "width": 120.0, "height": 28.0, "shape": 3, "durability": 2 },
+        { "x": 852.0, "y": 326.0, "width": 120.0, "height": 28.0, "shape": 5, "durability": 1 },
+
+        { "x": 438.0, "y": 378.0, "width": 120.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 714.0, "y": 378.0, "width": 120.0, "height": 28.0, "shape": 1, "durability": 1 }
+    ]
+}

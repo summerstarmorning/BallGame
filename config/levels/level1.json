@@ -1,0 +1,30 @@
+{
+    "version": 1,
+    "name": "Warmup Gate",
+    "game": {
+        "lives": 3
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 540.0,
+        "speedX": 0.0,
+        "speedY": -6.2,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 725.0,
+        "startY": 860.0,
+        "width": 150.0,
+        "height": 25.0
+    },
+    "bricks": [
+        {
+            "x": 748.0,
+            "y": 250.0,
+            "width": 104.0,
+            "height": 28.0,
+            "shape": 1,
+            "durability": 1
+        }
+    ]
+}

@@ -11,12 +11,15 @@
 #include "Brick.h"
 #include "Config/PowerUpConfig.hpp"
 #include "GameWorld.hpp"
+#include "Level/LevelData.hpp"
+#include "Level/LevelLoader.hpp"
 #include "Paddle.h"
 #include "Paddle.hpp"
 #include "Particles/ParticleSystem.hpp"
 #include "Performance/BrickSpatialGrid.hpp"
 #include "Profile/PlayerProfile.hpp"
 #include "PowerUps/PowerUpSystem.hpp"
+#include "Save/RunSaveState.hpp"
 #include "raylib.h"
 
 class Game {
@@ -97,6 +100,29 @@ private:
     game::PowerUpConfigSet powerUpConfigSet;
     game::GameWorld world;
     std::unique_ptr<game::Paddle> effectPaddle;
+    game::LevelLoader levelLoader;
+    game::LevelData currentLevelData;
+    std::string currentLevelPath;
+    game::RunSaveState resumeSaveState;
+    bool hasResumeSave {false};
+    bool continuePromptVisible {false};
+    bool editorModeActive {false};
+    bool bootAutoStart {false};
+    bool bootAutoContinue {false};
+    int demoExitLevel {0};
+    float demoExitHoldSeconds {0.0F};
+    float demoExitElapsed {0.0F};
+    std::string captureFrameDir;
+    bool captureFramesEnabled {false};
+    int captureFrameIndex {0};
+    int captureFrameStride {4};
+    int editorShape {1};
+    int editorDurability {1};
+    float editorBrickWidth {96.0F};
+    float editorBrickHeight {28.0F};
+    float noticeTimer {0.0F};
+    std::string noticeZh;
+    std::string noticeEn;
 
     Vector2 spawnBallPosition;
     Vector2 spawnBallVelocity;
@@ -121,16 +147,27 @@ private:
     void InitConfigAndBricks(const std::string& levelJsonFile);
     void InitBricks();
     void RebuildBrickSpatialGrid();
+    void ApplyLevelData(const game::LevelData& levelData);
+    bool LoadLevelForCurrentStage();
     void AssignPowerUpsToBricks();
     void LoadPowerUpConfig();
     void LoadBackgroundTextures();
     void UnloadBackgroundTextures();
     void LoadPlayerProfile();
     void SavePlayerProfile();
+    void SaveRuntimeProgress();
+    void ClearRuntimeSave();
+    void RefreshResumeSaveState();
+    void StartNewRun();
+    bool ContinueSavedRun();
+    void ShowNotice(const char* zhText, const char* enText, float seconds = 4.2F);
     void RegisterBrickDestroyed(int durability);
     void RegisterPowerUpCollected();
     void FinalizeRunProgress();
     void ResetBalls();
+    void ToggleEditorMode();
+    void HandleEditorInput();
+    void SaveCurrentLevelLayout();
 
     void SyncEffectPaddleToGameplay();
     void ApplyEffectPaddleToGameplay();
@@ -162,7 +199,14 @@ private:
     void JoinAsyncLoadThread();
 
 public:
-    Game(int width, int height);
+    Game(
+        int width,
+        int height,
+        bool autoStart = false,
+        bool autoContinue = false,
+        int autoExitLevel = 0,
+        float autoExitHoldSeconds = 0.0F,
+        std::string frameCaptureDir = {});
     ~Game();
     bool ShouldClose() const;
     void HandleInput();
