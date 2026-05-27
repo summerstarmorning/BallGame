@@ -54,11 +54,12 @@ void MultiBallEffect::apply(GameWorld& world)
     const Ball source = *sourceIt;
     const float speed = std::sqrt(source.velocity.x * source.velocity.x + source.velocity.y * source.velocity.y);
     const Vec2 baseDir = speed > 0.001F ? Vec2 {source.velocity.x / speed, source.velocity.y / speed} : Vec2 {0.0F, -1.0F};
-    const float targetSpeed = speed > 0.001F ? speed * 1.05F : 260.0F;
+    const float targetSpeed = speed > 0.001F ? speed * 1.14F : 300.0F;
     const float splitRadius = std::max(12.0F, source.radius * 0.94F);
-    const int splitCount = randomIntInclusive(3, 5); // total balls after split
-    const float minAngle = -42.0F;
-    const float maxAngle = 42.0F;
+    const int configuredCount = (int)std::lround(std::clamp(magnitude(), 4.0F, 9.0F));
+    const int splitCount = randomIntInclusive(std::max(4, configuredCount - 1), configuredCount);
+    const float minAngle = -58.0F;
+    const float maxAngle = 58.0F;
 
     sourceIt->radius = splitRadius;
     sourceIt->velocity = Vec2 {baseDir.x * targetSpeed, baseDir.y * targetSpeed};

@@ -1,14 +1,14 @@
 {
     "version": 1,
-    "name": "Warmup Gate",
+    "name": "起手门",
     "game": {
         "lives": 3
     },
     "ball": {
         "startX": 800.0,
-        "startY": 540.0,
-        "speedX": 0.0,
-        "speedY": -6.2,
+        "startY": 560.0,
+        "speedX": 3.8,
+        "speedY": -6.6,
         "radius": 15.0
     },
     "paddle": {
@@ -18,13 +18,14 @@
         "height": 25.0
     },
     "bricks": [
-        {
-            "x": 748.0,
-            "y": 250.0,
-            "width": 104.0,
-            "height": 28.0,
-            "shape": 1,
-            "durability": 1
-        }
+        { "x": 420.0, "y": 174.0, "width": 118.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 558.0, "y": 174.0, "width": 118.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 696.0, "y": 174.0, "width": 118.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 834.0, "y": 174.0, "width": 118.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 972.0, "y": 174.0, "width": 118.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 520.0, "y": 232.0, "width": 128.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 736.0, "y": 232.0, "width": 128.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 952.0, "y": 232.0, "width": 128.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 628.0, "y": 292.0, "width": 344.0, "height": 30.0, "shape": 0, "durability": 1 }
     ]
 }

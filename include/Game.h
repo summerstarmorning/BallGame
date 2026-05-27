@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -25,7 +26,7 @@
 class Game {
 private:
     static constexpr float WALL_THICKNESS = 5.0f;
-    static constexpr float PADDLE_BASE_SPEED = 8.5f;
+    static constexpr float PADDLE_BASE_SPEED = 10.4f;
     static constexpr int PAUSE_BUTTON_SIZE = 34;
     static constexpr float HUD_HEIGHT = 78.0f;
 
@@ -41,6 +42,12 @@ private:
     struct BackgroundPack {
         Texture2D menu {};
         std::vector<Texture2D> levels {};
+    };
+
+    struct GameArtAssets {
+        Texture2D ball {};
+        Texture2D paddle {};
+        std::array<Texture2D, 10> bricks {};
     };
 
     struct MenuStyleButtonRects {
@@ -137,12 +144,25 @@ private:
     bool hasDisplayFont;
     BackgroundPack darkBackgrounds {};
     BackgroundPack lightBackgrounds {};
+    GameArtAssets gameArt {};
     std::mutex asyncLoadMutex {};
     std::thread asyncLoadThread {};
     AsyncLoadSharedState asyncLoadShared {};
     bool asyncLoadActive {false};
     float asyncLoadProgressUi {0.0F};
     float asyncLoadSuccessTimer {0.0F};
+    float impactFreezeTimer {0.0F};
+    float screenShakeTimer {0.0F};
+    float screenShakeMagnitude {0.0F};
+    float hitFlashTimer {0.0F};
+    float powerSurgeTimer {0.0F};
+    int lastObservedPowerUpCollections {0};
+    int comboCount {0};
+    int comboMultiplier {1};
+    float comboTimer {0.0F};
+    float comboPulseTimer {0.0F};
+    float levelClearTimer {0.0F};
+    int levelClearStage {0};
 
     void InitConfigAndBricks(const std::string& levelJsonFile);
     void InitBricks();
@@ -153,6 +173,8 @@ private:
     void LoadPowerUpConfig();
     void LoadBackgroundTextures();
     void UnloadBackgroundTextures();
+    void LoadGameplayArt();
+    void UnloadGameplayArt();
     void LoadPlayerProfile();
     void SavePlayerProfile();
     void SaveRuntimeProgress();
@@ -161,6 +183,8 @@ private:
     void StartNewRun();
     bool ContinueSavedRun();
     void ShowNotice(const char* zhText, const char* enText, float seconds = 4.2F);
+    void RegisterComboHit(bool destroyed);
+    void ResetCombo();
     void RegisterBrickDestroyed(int durability);
     void RegisterPowerUpCollected();
     void FinalizeRunProgress();
@@ -181,11 +205,13 @@ private:
     Color GetBrickDisplayColor(std::size_t brickIndex, Color baseColor, float timeSeconds, float globalGlow) const;
 
     void SpawnEdgeParticles(const Vector2& origin, const Vector2& normal, int count);
+    void TriggerImpact(float freezeSeconds, float shakeMagnitude);
     void UpdateEdgeParticles();
     void DrawEdgeParticles() const;
     void DrawPowerUps() const;
     void DrawParticles() const;
     void DrawActiveEffects() const;
+    void DrawLevelClearBurst(float timeSeconds, Color accent, Color textColor) const;
     void DrawLocalized(const char* zhText, const char* enText, float x, float y, float fontSize, Color color) const;
     void DrawLocalizedf(const char* zhPrefix, const char* enPrefix, int value, float x, float y, float fontSize, Color color) const;
     void DrawDisplayText(const char* text, Vector2 position, float fontSize, float spacing, Color color) const;
@@ -193,6 +219,7 @@ private:
     float PaddleMinY() const;
     float PaddleMaxY() const;
     const Texture2D* ResolveCurrentBackground() const;
+    const Texture2D* ResolveBrickTexture(std::size_t brickIndex) const;
     MenuStyleButtonRects MenuStyleButtons() const;
     void StartAsyncLoadDemo();
     void PollAsyncLoadDemo(float deltaSeconds);

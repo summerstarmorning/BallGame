@@ -1,0 +1,40 @@
+{
+    "version": 1,
+    "name": "蜂巢裂变",
+    "game": {
+        "lives": 4
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 545.0,
+        "speedX": 4.8,
+        "speedY": -7.8,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 704.0,
+        "startY": 860.0,
+        "width": 126.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 512.0, "y": 158.0, "width": 102.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 632.0, "y": 158.0, "width": 102.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 752.0, "y": 158.0, "width": 102.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 872.0, "y": 158.0, "width": 102.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 992.0, "y": 158.0, "width": 102.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 452.0, "y": 214.0, "width": 102.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 572.0, "y": 214.0, "width": 102.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 692.0, "y": 214.0, "width": 102.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 812.0, "y": 214.0, "width": 102.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 932.0, "y": 214.0, "width": 102.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 1052.0, "y": 214.0, "width": 102.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 512.0, "y": 270.0, "width": 102.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 632.0, "y": 270.0, "width": 102.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 752.0, "y": 270.0, "width": 102.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 872.0, "y": 270.0, "width": 102.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 992.0, "y": 270.0, "width": 102.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 692.0, "y": 328.0, "width": 102.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 812.0, "y": 328.0, "width": 102.0, "height": 28.0, "shape": 2, "durability": 1 }
+    ]
+}

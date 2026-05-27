@@ -53,28 +53,28 @@ void ParticleSystem::spawnBrickBurst(const Vec2& origin, std::size_t count)
     for (std::size_t i = 0; i < count; ++i)
     {
         const float angle = randomFloat(-3.1415926F, 3.1415926F);
-        const float speed = randomFloat(120.0F, 340.0F);
+        const float speed = randomFloat(210.0F, 560.0F);
         Vec2 velocity {
             std::cos(angle) * speed,
-            std::sin(angle) * speed - randomFloat(35.0F, 130.0F),
+            std::sin(angle) * speed - randomFloat(80.0F, 210.0F),
         };
 
         Color burstColor = palette[(std::size_t)randomInt(0, (int)palette.size() - 1)];
         burstColor.a = (unsigned char)randomInt(170, 255);
-        emit(Particle {origin, velocity, burstColor, randomFloat(0.28F, 0.86F), 0.0F, true});
+        emit(Particle {origin, velocity, burstColor, randomFloat(0.16F, 0.42F), 0.0F, true});
     }
 
-    const std::size_t sparkleCount = std::max<std::size_t>(3U, count / 3U);
+    const std::size_t sparkleCount = std::max<std::size_t>(6U, count / 2U);
     for (std::size_t i = 0; i < sparkleCount; ++i)
     {
         const float angle = randomFloat(-3.1415926F, 3.1415926F);
-        const float speed = randomFloat(220.0F, 460.0F);
+        const float speed = randomFloat(360.0F, 740.0F);
         const Color sparkleColor = randomInt(0, 1) == 0 ? Color {255, 255, 255, 240} : Color {255, 238, 145, 230};
         emit(Particle {
             origin,
             Vec2 {std::cos(angle) * speed, std::sin(angle) * speed},
             sparkleColor,
-            randomFloat(0.16F, 0.36F),
+            randomFloat(0.08F, 0.20F),
             0.0F,
             true,
         });
@@ -89,7 +89,7 @@ void ParticleSystem::spawnPowerUpTrail(const Vec2& origin, std::size_t count)
             Vec2 {origin.x + randomFloat(-4.0F, 4.0F), origin.y + randomFloat(-3.0F, 3.0F)},
             Vec2 {randomFloat(-26.0F, 26.0F), randomFloat(18.0F, 76.0F)},
             Color {(unsigned char)randomInt(110, 180), (unsigned char)randomInt(210, 255), 255, (unsigned char)randomInt(130, 210)},
-            randomFloat(0.22F, 0.40F),
+            randomFloat(0.14F, 0.26F),
             0.0F,
             true,
         });
@@ -127,7 +127,7 @@ void ParticleSystem::spawnBallTrail(const Vec2& origin, const Vec2& velocity, co
                 -dir.y * backSpeed + side.y * sideSpeed,
             },
             c,
-            randomFloat(0.10F, 0.24F),
+            randomFloat(0.08F, 0.18F),
             0.0F,
             true,
         });

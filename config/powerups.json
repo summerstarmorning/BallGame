@@ -2,44 +2,44 @@
   "powerups": [
     {
       "type": "expand_paddle",
-      "dropChance": 0.34,
-      "durationSeconds": 18.0,
-      "magnitude": 2.2,
+      "dropChance": 0.68,
+      "durationSeconds": 28.0,
+      "magnitude": 3.85,
       "permanent": false
     },
     {
       "type": "multi_ball",
-      "dropChance": 0.20,
+      "dropChance": 0.58,
       "durationSeconds": 0.0,
-      "magnitude": 3.0,
+      "magnitude": 7.0,
       "permanent": true
     },
     {
       "type": "slow_ball",
-      "dropChance": 0.26,
-      "durationSeconds": 12.0,
-      "magnitude": 1.35,
+      "dropChance": 0.42,
+      "durationSeconds": 16.0,
+      "magnitude": 1.75,
       "permanent": false
     },
     {
       "type": "paddle_speed",
-      "dropChance": 0.24,
-      "durationSeconds": 14.0,
-      "magnitude": 1.7,
+      "dropChance": 0.50,
+      "durationSeconds": 22.0,
+      "magnitude": 2.65,
       "permanent": false
     },
     {
       "type": "pierce_ball",
-      "dropChance": 0.18,
+      "dropChance": 0.50,
       "durationSeconds": 0.0,
-      "magnitude": 4.0,
+      "magnitude": 8.0,
       "permanent": true
     }
   ],
   "particles": {
-    "maxCount": 512,
-    "brickBurstCount": 28,
-    "powerUpTrailCount": 6
+    "maxCount": 1500,
+    "brickBurstCount": 92,
+    "powerUpTrailCount": 18
   },
   "debug": {
     "showCollisionBoxes": false,

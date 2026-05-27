@@ -1,0 +1,103 @@
+{
+  "enhancements": {
+    "difficulty": {
+      "enabled": true,
+      "default": "normal"
+    },
+    "combo": {
+      "enabled": true,
+      "timeout_seconds": 2.5,
+      "multiplier_thresholds": {
+        "2x": 5,
+        "3x": 15,
+        "5x": 30,
+        "10x": 50
+      }
+    },
+    "achievements": {
+      "enabled": true,
+      "display_notifications": true,
+      "notification_duration": 3.0
+    },
+    "statistics": {
+      "enabled": true,
+      "track_accuracy": true,
+      "track_lifetime": true
+    },
+    "sound": {
+      "enabled": true,
+      "master_volume": 1.0,
+      "sfx_volume": 1.0,
+      "music_volume": 0.8,
+      "audio_device": "default"
+    },
+    "leaderboard": {
+      "enabled": true,
+      "max_local_entries": 100,
+      "max_display_entries": 20,
+      "auto_save": true,
+      "save_interval_seconds": 30.0
+    },
+    "tutorial": {
+      "enabled": true,
+      "auto_start_new_game": true,
+      "skip_available": true
+    },
+    "boss_levels": {
+      "enabled": true,
+      "boss_frequency": 5,
+      "boss_health_multiplier": 1.0,
+      "boss_difficulty_scaling": true
+    },
+    "dynamic_difficulty": {
+      "enabled": true,
+      "win_threshold": 3,
+      "loss_threshold": 2,
+      "adjustment_cooldown": 10.0
+    }
+  },
+  "powerups": {
+    "extended": {
+      "enabled": true,
+      "new_types": [
+        {
+          "name": "TimeFreeze",
+          "icon": "❄️",
+          "duration": 5.0,
+          "effect": "freeze_enemies"
+        },
+        {
+          "name": "BallSpeedUp",
+          "icon": "⚡",
+          "duration": 3.0,
+          "effect": "increase_ball_speed",
+          "multiplier": 1.5
+        },
+        {
+          "name": "ShieldBrick",
+          "icon": "🛡️",
+          "duration": 8.0,
+          "effect": "protect_from_loss"
+        }
+      ]
+    }
+  },
+  "visual_effects": {
+    "enhanced_particles": {
+      "enabled": true,
+      "max_particles": 2000,
+      "boss_combat_effects": true
+    },
+    "ui_animations": {
+      "enabled": true,
+      "transition_duration": 0.3,
+      "menu_smooth_scroll": true
+    },
+    "combo_feedback": {
+      "enabled": true,
+      "show_multiplier": true,
+      "floating_text": true,
+      "screen_shake_intensity": 0.5
+    }
+  }
+}

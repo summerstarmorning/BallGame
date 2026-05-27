@@ -1,0 +1,39 @@
+{
+    "version": 1,
+    "name": "中路爆破",
+    "game": {
+        "lives": 4
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 552.0,
+        "speedX": 1.8,
+        "speedY": -7.4,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 710.0,
+        "startY": 860.0,
+        "width": 130.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 464.0, "y": 154.0, "width": 112.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 604.0, "y": 154.0, "width": 112.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 744.0, "y": 154.0, "width": 112.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 884.0, "y": 154.0, "width": 112.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 1024.0, "y": 154.0, "width": 112.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 604.0, "y": 214.0, "width": 112.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 744.0, "y": 214.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 884.0, "y": 214.0, "width": 112.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 744.0, "y": 274.0, "width": 112.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 604.0, "y": 334.0, "width": 112.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 744.0, "y": 334.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 884.0, "y": 334.0, "width": 112.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 464.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 604.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 744.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 884.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 1024.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 2, "durability": 1 }
+    ]
+}

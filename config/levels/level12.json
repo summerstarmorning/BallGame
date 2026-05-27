@@ -1,0 +1,39 @@
+{
+    "version": 1,
+    "name": "终极洪流",
+    "game": {
+        "lives": 5
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 540.0,
+        "speedX": -7.0,
+        "speedY": -8.4,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 698.0,
+        "startY": 860.0,
+        "width": 120.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 238.0, "y": 132.0, "width": 100.0, "height": 26.0, "shape": 5, "durability": 1 },
+        { "x": 358.0, "y": 172.0, "width": 100.0, "height": 26.0, "shape": 4, "durability": 1 },
+        { "x": 478.0, "y": 212.0, "width": 100.0, "height": 26.0, "shape": 3, "durability": 1 },
+        { "x": 598.0, "y": 252.0, "width": 100.0, "height": 26.0, "shape": 2, "durability": 1 },
+        { "x": 718.0, "y": 292.0, "width": 100.0, "height": 26.0, "shape": 1, "durability": 1 },
+        { "x": 838.0, "y": 292.0, "width": 100.0, "height": 26.0, "shape": 1, "durability": 1 },
+        { "x": 958.0, "y": 252.0, "width": 100.0, "height": 26.0, "shape": 2, "durability": 1 },
+        { "x": 1078.0, "y": 212.0, "width": 100.0, "height": 26.0, "shape": 3, "durability": 1 },
+        { "x": 1198.0, "y": 172.0, "width": 100.0, "height": 26.0, "shape": 4, "durability": 1 },
+        { "x": 1318.0, "y": 132.0, "width": 100.0, "height": 26.0, "shape": 5, "durability": 1 },
+        { "x": 358.0, "y": 402.0, "width": 100.0, "height": 26.0, "shape": 2, "durability": 1 },
+        { "x": 478.0, "y": 362.0, "width": 100.0, "height": 26.0, "shape": 3, "durability": 1 },
+        { "x": 598.0, "y": 322.0, "width": 100.0, "height": 26.0, "shape": 4, "durability": 1 },
+        { "x": 958.0, "y": 322.0, "width": 100.0, "height": 26.0, "shape": 4, "durability": 1 },
+        { "x": 1078.0, "y": 362.0, "width": 100.0, "height": 26.0, "shape": 3, "durability": 1 },
+        { "x": 1198.0, "y": 402.0, "width": 100.0, "height": 26.0, "shape": 2, "durability": 1 },
+        { "x": 718.0, "y": 438.0, "width": 220.0, "height": 30.0, "shape": 0, "durability": 1 }
+    ]
+}

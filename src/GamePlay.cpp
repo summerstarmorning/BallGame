@@ -12,9 +12,9 @@ constexpr float kCollisionSlop = 0.01F;
 constexpr float kContactEpsilon = 0.0001F;
 constexpr float kPaddleRestitution = 1.0F;
 constexpr float kDirectionEpsilon = 0.001F;
-constexpr float kMinVerticalSpeedRatio = 0.48F;
-constexpr float kPaddleHorizontalTransfer = 0.42F;
-constexpr float kPaddleVerticalTransfer = 0.18F;
+constexpr float kMinVerticalSpeedRatio = 0.54F;
+constexpr float kPaddleHorizontalTransfer = 0.54F;
+constexpr float kPaddleVerticalTransfer = 0.22F;
 
 float Dot(const game::Vec2& a, const game::Vec2& b)
 {
@@ -132,18 +132,7 @@ void ConstrainBallTravelDirection(game::Ball& ball)
 
 int ChooseBrickDurability(int row)
 {
-    const int roll = GetRandomValue(0, 99);
-    const bool upperRows = row <= 2;
-    if ((upperRows && roll > 87) || roll > 95)
-    {
-        return 3;
-    }
-
-    if ((upperRows && roll > 58) || roll > 74)
-    {
-        return 2;
-    }
-
+    (void)row;
     return 1;
 }
 
@@ -219,7 +208,7 @@ void Game::InitBricks()
     bricks.clear();
     for (const game::BrickRecord& brick : currentLevelData.bricks)
     {
-        bricks.emplace_back(brick.x, brick.y, brick.width, brick.height, brick.shape, brick.durability);
+        bricks.emplace_back(brick.x, brick.y, brick.width, brick.height, brick.shape, 1);
     }
 
     if (!currentLevelData.bricks.empty())
@@ -278,7 +267,7 @@ void Game::AssignPowerUpsToBricks()
         return;
     }
 
-    const float perBrickDropChance = std::clamp(0.14F + totalWeight * 0.36F, 0.30F, 0.86F);
+    const float perBrickDropChance = std::clamp(0.36F + totalWeight * 0.50F, 0.72F, 1.0F);
 
     for (std::size_t index = 0; index < brickPowerUps.size(); ++index)
     {
@@ -328,7 +317,7 @@ void Game::AssignPowerUpsToBricks()
         {
             return value.has_value() && *value == game::PowerUpType::MultiBall;
         });
-    const int targetMultiBallCount = std::min<int>(3, (int)brickPowerUps.size());
+    const int targetMultiBallCount = std::min<int>(8, (int)brickPowerUps.size());
     std::vector<std::size_t> multiBallCandidates;
     multiBallCandidates.reserve(brickPowerUps.size());
     for (std::size_t index = 0; index < brickPowerUps.size(); ++index)
@@ -442,11 +431,14 @@ void Game::HandleBalls(const game::Vec2& paddleVelocity, float deltaSeconds)
         HandleBallPaddleCollision(managedBall, paddleVelocity);
         HandleBallBrickCollision(managedBall);
         ConstrainBallTravelDirection(managedBall);
+        const std::size_t trailCount = 6U
+            + (std::size_t)std::min<int>(6, (int)powerUpSystem.activeEffects().size() * 2)
+            + (pendingPierceCharges > 0 ? 4U : 0U);
         particleSystem.spawnBallTrail(
             managedBall.position,
             managedBall.velocity,
             game::Color {ballColor.r, ballColor.g, ballColor.b, 220},
-            3U);
+            trailCount);
     }
 
     if (ballManager.consumeLifeLoss())
@@ -456,6 +448,7 @@ void Game::HandleBalls(const game::Vec2& paddleVelocity, float deltaSeconds)
             --lives;
             ++playerProfile.totalBallLosses;
         }
+        ResetCombo();
 
         if (lives <= 0 && !debugMode)
         {
@@ -547,6 +540,7 @@ void Game::HandleBallPaddleCollision(game::Ball& managedBall, const game::Vec2& 
     const game::Vec2 reflectedRelativeVelocity
         = relativeVelocity - collisionNormal * ((1.0F + kPaddleRestitution) * normalVelocity);
     managedBall.velocity = reflectedRelativeVelocity + effectivePaddleVelocity;
+    TriggerImpact(0.014F, 1.8F);
 }
 
 void Game::HandleBallBrickCollision(game::Ball& managedBall)
@@ -608,21 +602,29 @@ void Game::HandleBallBrickCollision(game::Ball& managedBall)
 
         const int damage = usePierceCharge ? std::max(1, brick.HitPoints()) : 1;
         const bool destroyed = brick.ApplyHit(damage);
-        score += destroyed ? 100 * brick.MaxHitPoints() : 45;
+        RegisterComboHit(destroyed);
+        const int baseScore = destroyed ? 100 * brick.MaxHitPoints() : 45;
+        score += destroyed ? baseScore * std::max(1, comboMultiplier) : baseScore;
         if (destroyed)
         {
             RegisterBrickDestroyed(brick.MaxHitPoints());
         }
 
+        if (destroyed)
+        {
+            hitFlashTimer = std::max(hitFlashTimer, 0.075F);
+        }
+        TriggerImpact(destroyed ? 0.045F : 0.018F, destroyed ? 12.0F : 4.2F);
+
         particleSystem.spawnBrickBurst(
             burstOrigin,
-            destroyed ? powerUpConfigSet.particles.brickBurstCount : powerUpConfigSet.particles.brickBurstCount / 3U + 4U);
+            destroyed ? powerUpConfigSet.particles.brickBurstCount + 26U : powerUpConfigSet.particles.brickBurstCount / 2U + 8U);
 
         if (destroyed)
         {
             particleSystem.spawnBrickBurst(
                 burstOrigin,
-                powerUpConfigSet.particles.brickBurstCount / 3U + 6U);
+                powerUpConfigSet.particles.brickBurstCount / 2U + 24U);
             MaybeSpawnPowerUpFromBrick(brickIndex, brickRect);
         }
 
@@ -659,12 +661,18 @@ void Game::CheckLevelProgress()
     const auto& levels = game_style::levelConfigs();
     if (currentLevel < (int)levels.size())
     {
+        levelClearStage = currentLevel;
+        levelClearTimer = 1.05F;
+        particleSystem.spawnBrickBurst(
+            game::Vec2 {(float)screenWidth * 0.5F, HUD_HEIGHT + ((float)screenHeight - HUD_HEIGHT) * 0.35F},
+            powerUpConfigSet.particles.brickBurstCount + 42U);
         ++currentLevel;
-        particleSystem.clear();
+        ShowNotice(u8"\u5173\u5361\u7a81\u7834\uff0c\u4e0b\u4e00\u9635\u5217\u5df2\u5c55\u5f00", u8"\u5173\u5361\u7a81\u7834", 1.25F);
         edgeParticles.clear();
         LoadLevelForCurrentStage();
         powerUpSystem.onLevelTransition(world, true);
         ResetBalls();
+        TriggerImpact(0.035F, 8.5F);
         SaveRuntimeProgress();
         return;
     }
@@ -718,10 +726,10 @@ void Game::SpawnEdgeParticles(const Vector2& origin, const Vector2& normal, int 
     const Vector2 tangent {-normal.y, normal.x};
     for (int index = 0; index < count; ++index)
     {
-        const float normalSpeed = 100.0F + (float)GetRandomValue(0, 90);
-        const float tangentSpeed = (float)GetRandomValue(-70, 70);
-        const float maxLife = 0.30F + (float)GetRandomValue(0, 55) / 100.0F;
-        const float size = 1.8F + (float)GetRandomValue(0, 18) / 10.0F;
+        const float normalSpeed = 150.0F + (float)GetRandomValue(0, 150);
+        const float tangentSpeed = (float)GetRandomValue(-120, 120);
+        const float maxLife = 0.18F + (float)GetRandomValue(0, 28) / 100.0F;
+        const float size = 2.0F + (float)GetRandomValue(0, 24) / 10.0F;
 
         EdgeParticle particle {};
         particle.position = origin;
@@ -741,6 +749,13 @@ void Game::SpawnEdgeParticles(const Vector2& origin, const Vector2& normal, int 
         const std::size_t overflow = edgeParticles.size() - (std::size_t)MAX_EDGE_PARTICLES;
         edgeParticles.erase(edgeParticles.begin(), edgeParticles.begin() + overflow);
     }
+}
+
+void Game::TriggerImpact(float freezeSeconds, float shakeMagnitude)
+{
+    impactFreezeTimer = std::max(impactFreezeTimer, std::clamp(freezeSeconds, 0.0F, 0.09F));
+    screenShakeTimer = std::max(screenShakeTimer, std::clamp(freezeSeconds * 4.6F, 0.0F, 0.30F));
+    screenShakeMagnitude = std::max(screenShakeMagnitude, std::clamp(shakeMagnitude, 0.0F, 14.0F));
 }
 
 void Game::UpdateEdgeParticles()

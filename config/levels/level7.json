@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "峡谷穿行",
+    "game": {
+        "lives": 4
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 548.0,
+        "speedX": 5.4,
+        "speedY": -7.4,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 710.0,
+        "startY": 860.0,
+        "width": 132.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 260.0, "y": 150.0, "width": 118.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 398.0, "y": 184.0, "width": 118.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 536.0, "y": 218.0, "width": 118.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 674.0, "y": 252.0, "width": 118.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 812.0, "y": 252.0, "width": 118.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 950.0, "y": 218.0, "width": 118.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 1088.0, "y": 184.0, "width": 118.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 1226.0, "y": 150.0, "width": 118.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 398.0, "y": 360.0, "width": 118.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 536.0, "y": 326.0, "width": 118.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 950.0, "y": 326.0, "width": 118.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 1088.0, "y": 360.0, "width": 118.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 708.0, "y": 408.0, "width": 184.0, "height": 30.0, "shape": 4, "durability": 1 }
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "风车回旋",
+    "game": {
+        "lives": 5
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 538.0,
+        "speedX": 6.8,
+        "speedY": -8.2,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 700.0,
+        "startY": 860.0,
+        "width": 122.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 744.0, "y": 252.0, "width": 112.0, "height": 30.0, "shape": 0, "durability": 1 },
+        { "x": 604.0, "y": 204.0, "width": 112.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 464.0, "y": 156.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 884.0, "y": 204.0, "width": 112.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 1024.0, "y": 156.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 604.0, "y": 300.0, "width": 112.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 464.0, "y": 348.0, "width": 112.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 884.0, "y": 300.0, "width": 112.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 1024.0, "y": 348.0, "width": 112.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 744.0, "y": 150.0, "width": 112.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 744.0, "y": 354.0, "width": 112.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 534.0, "y": 252.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 954.0, "y": 252.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 }
+    ]
+}

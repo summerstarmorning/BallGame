@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "阶梯冲刺",
+    "game": {
+        "lives": 4
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 552.0,
+        "speedX": -6.0,
+        "speedY": -7.6,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 708.0,
+        "startY": 860.0,
+        "width": 128.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 250.0, "y": 420.0, "width": 116.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 390.0, "y": 380.0, "width": 116.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 530.0, "y": 340.0, "width": 116.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 670.0, "y": 300.0, "width": 116.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 810.0, "y": 260.0, "width": 116.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 950.0, "y": 220.0, "width": 116.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 1090.0, "y": 180.0, "width": 116.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 390.0, "y": 190.0, "width": 116.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 530.0, "y": 230.0, "width": 116.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 670.0, "y": 270.0, "width": 116.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 810.0, "y": 310.0, "width": 116.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 950.0, "y": 350.0, "width": 116.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 1090.0, "y": 390.0, "width": 116.0, "height": 28.0, "shape": 0, "durability": 1 }
+    ]
+}

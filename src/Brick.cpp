@@ -158,11 +158,6 @@ void Brick::Draw(Color c)
         const Vector2 p3 {r.x + r.width - cut, r.y + r.height};
         const Vector2 p4 {r.x, r.y + r.height};
         drawQuad(p1, p2, p3, p4, fill, stroke);
-        DrawLineEx(
-            Vector2 {r.x + cut * 1.2F, r.y + r.height * 0.24F},
-            Vector2 {r.x + r.width - cut * 1.3F, r.y + r.height * 0.24F},
-            2.0F,
-            ColorAlpha(highlight, 0.36F));
         break;
     }
     case Shape::Diamond: {
@@ -171,37 +166,10 @@ void Brick::Draw(Color c)
         const Vector2 p3 {r.x + r.width * 0.5F, r.y + r.height};
         const Vector2 p4 {r.x, r.y + r.height * 0.5F};
         drawQuad(p1, p2, p3, p4, fill, stroke);
-        DrawLineEx(
-            Vector2 {r.x + r.width * 0.28F, r.y + r.height * 0.5F},
-            Vector2 {r.x + r.width * 0.72F, r.y + r.height * 0.5F},
-            2.0F,
-            ColorAlpha(highlight, 0.40F));
         break;
     }
     case Shape::Hex:
         drawHex(r, fill, stroke);
-        DrawLineEx(
-            Vector2 {r.x + r.width * 0.24F, r.y + r.height * 0.22F},
-            Vector2 {r.x + r.width * 0.76F, r.y + r.height * 0.22F},
-            2.0F,
-            ColorAlpha(highlight, 0.34F));
         break;
-    }
-
-    if (maxHitPoints > 1)
-    {
-        const float pipWidth = 12.0F;
-        const float pipHeight = 4.0F;
-        const float gap = 4.0F;
-        const float totalWidth = (float)maxHitPoints * pipWidth + (float)(maxHitPoints - 1) * gap;
-        float startX = r.x + (r.width - totalWidth) * 0.5F;
-        const float y = r.y + 6.0F;
-
-        for (int index = 0; index < maxHitPoints; ++index)
-        {
-            const Rectangle pip {startX + index * (pipWidth + gap), y, pipWidth, pipHeight};
-            const Color pipColor = index < hitPoints ? ColorAlpha(WHITE, 0.90F) : ColorAlpha(BLACK, 0.26F);
-            DrawRectangleRounded(pip, 0.65F, 4, pipColor);
-        }
     }
 }

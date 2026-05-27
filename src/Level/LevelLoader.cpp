@@ -18,7 +18,7 @@ game::BrickRecord parseBrickRecord(const json& item)
     brick.width = std::max(20.0F, item.value("width", brick.width));
     brick.height = std::max(14.0F, item.value("height", brick.height));
     brick.shape = std::clamp(item.value("shape", brick.shape), 0, 5);
-    brick.durability = std::max(1, item.value("durability", brick.durability));
+    brick.durability = 1;
     return brick;
 }
 } // namespace
@@ -183,7 +183,7 @@ LevelData LevelLoader::buildFallbackLevel(int levelNumber, int screenWidth, int 
             brick.width = width;
             brick.height = height;
             brick.shape = (row + column + levelNumber) % 6;
-            brick.durability = 1 + ((row + levelNumber) % 3 == 0 ? 1 : 0) + ((column + row) % 7 == 0 ? 1 : 0);
+            brick.durability = 1;
             level.bricks.push_back(brick);
         }
     }

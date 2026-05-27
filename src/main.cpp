@@ -11,7 +11,7 @@ int main(int argc, char** argv)
     std::system("chcp 65001 > nul");
 #endif
 
-    std::cout << "Game started: move with arrow keys, press Q to quit.\n";
+    std::cout << u8"\u6e38\u620f\u5df2\u542f\u52a8\uff1a\u65b9\u5411\u952e\u79fb\u52a8\uff0c\u9000\u51fa\u952e\u7ed3\u675f\u3002\n";
 
     bool autoStart = false;
     bool autoContinue = false;
@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 
     const int screenWidth = 1600;
     const int screenHeight = 960;
-    InitWindow(screenWidth, screenHeight, "Break all the bricks with the ball");
+    InitWindow(screenWidth, screenHeight, u8"\u8857\u673a\u7834\u9635");
     if (demoExitLevel > 0)
     {
         SetWindowState(FLAG_WINDOW_TOPMOST);

@@ -141,6 +141,13 @@ target_include_directories(game_systems PUBLIC include)
 target_include_directories(game_systems PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/raylib/raylib-5.0_win64_msvc16/include")
 target_link_libraries(breakout_week2 PRIVATE game_systems)
 
+if(MSVC)
+    target_compile_options(breakout_week2 PRIVATE /utf-8)
+    target_compile_options(game_systems PRIVATE /utf-8)
+    target_compile_options(test_collision PRIVATE /utf-8)
+    target_compile_options(collision_benchmark PRIVATE /utf-8)
+endif()
+
 add_library(game_networking
     src/Networking/NetworkPackets.cpp
     src/Networking/NetworkSession.cpp

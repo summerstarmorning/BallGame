@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "name": "双翼夹击",
+    "game": {
+        "lives": 4
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 536.0,
+        "speedX": -5.8,
+        "speedY": -7.0,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 710.0,
+        "startY": 860.0,
+        "width": 136.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 198.0, "y": 166.0, "width": 132.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 346.0, "y": 166.0, "width": 132.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 1122.0, "y": 166.0, "width": 132.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 1270.0, "y": 166.0, "width": 132.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 270.0, "y": 224.0, "width": 132.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 418.0, "y": 224.0, "width": 132.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 1050.0, "y": 224.0, "width": 132.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 1198.0, "y": 224.0, "width": 132.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 342.0, "y": 282.0, "width": 132.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 974.0, "y": 282.0, "width": 132.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 568.0, "y": 356.0, "width": 132.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 728.0, "y": 356.0, "width": 132.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 888.0, "y": 356.0, "width": 132.0, "height": 28.0, "shape": 4, "durability": 1 }
+    ]
+}

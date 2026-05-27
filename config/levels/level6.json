@@ -1,0 +1,42 @@
+{
+    "version": 1,
+    "name": "终局环阵",
+    "game": {
+        "lives": 5
+    },
+    "ball": {
+        "startX": 800.0,
+        "startY": 540.0,
+        "speedX": 6.4,
+        "speedY": -7.2,
+        "radius": 15.0
+    },
+    "paddle": {
+        "startX": 710.0,
+        "startY": 860.0,
+        "width": 126.0,
+        "height": 25.0
+    },
+    "bricks": [
+        { "x": 420.0, "y": 140.0, "width": 112.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 560.0, "y": 140.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 700.0, "y": 140.0, "width": 112.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 840.0, "y": 140.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 980.0, "y": 140.0, "width": 112.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 350.0, "y": 198.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 1050.0, "y": 198.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 350.0, "y": 256.0, "width": 112.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 560.0, "y": 256.0, "width": 112.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 770.0, "y": 256.0, "width": 112.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 980.0, "y": 256.0, "width": 112.0, "height": 28.0, "shape": 2, "durability": 1 },
+        { "x": 1190.0, "y": 256.0, "width": 112.0, "height": 28.0, "shape": 3, "durability": 1 },
+        { "x": 420.0, "y": 314.0, "width": 112.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 630.0, "y": 314.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 840.0, "y": 314.0, "width": 112.0, "height": 28.0, "shape": 4, "durability": 1 },
+        { "x": 1050.0, "y": 314.0, "width": 112.0, "height": 28.0, "shape": 5, "durability": 1 },
+        { "x": 560.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 1, "durability": 1 },
+        { "x": 700.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 840.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 0, "durability": 1 },
+        { "x": 980.0, "y": 394.0, "width": 112.0, "height": 28.0, "shape": 1, "durability": 1 }
+    ]
+}

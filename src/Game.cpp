@@ -71,7 +71,7 @@ std::vector<int> buildUiFontCodepoints()
         u8"\u672c\u5173\u6e05\u7a7a\u81ea\u52a8\u8fdb\u5165\u4e0b\u4e00\u5173",
         u8"\u8c03\u8bd5 \u65e0\u654c",
         u8"\u6253\u7816\u5757 \u7ade\u6280\u7248",
-        u8"\u6309 ENTER \u4ece\u7b2c\u4e00\u5173\u5f00\u59cb",
+        u8"\u6309\u56de\u8f66\u952e\u4ece\u7b2c\u4e00\u5173\u5f00\u59cb",
         u8"\u5173\u5361\u4f1a\u81ea\u52a8\u8854\u63a5\uff0c\u9053\u5177\u548c\u591a\u7403\u4f1a\u7ee7\u7eed\u751f\u6548",
         u8"\u4e3b\u9898 \u6697\u8272 \u4eae\u8272 \u7403\u4f53\u914d\u8272 \u6321\u677f\u914d\u8272 \u7816\u5757\u914d\u8272",
         u8"\u5df2\u6682\u505c \u6309 P \u6216\u70b9\u51fb\u53f3\u4e0a\u89d2\u7ee7\u7eed",
@@ -84,14 +84,14 @@ std::vector<int> buildUiFontCodepoints()
         u8"\u81ea\u52a8\u8854\u63a5\u8fde\u7eed\u95ef\u5173",
         u8"\u8f6f\u8d27\u5e01 \u5386\u53f2\u6700\u9ad8 \u603b\u5c40\u6570",
         u8"\u5546\u4e1a\u5316\u9ad8\u4fdd\u771f\u6253\u7816\u5757\u539f\u578b",
-        u8"\u6309 ENTER \u7acb\u5373\u5f00\u59cb\u8fd9\u4e00\u8f6e",
+        u8"\u6309\u56de\u8f66\u952e\u7acb\u5373\u5f00\u59cb\u8fd9\u4e00\u8f6e",
         u8"\u5355\u5c40\u5206\u6570\u3001\u9053\u5177\u53e0\u5c42\u4e0e\u5173\u5361\u8fde\u9501\u5168\u90e8\u4fdd\u7559",
         u8"\u65e5\u5fd7\u5f0f\u6210\u957f\u4e0e\u8f6f\u8d27\u5e01\u7559\u5b58",
         u8"\u4e3b\u9898\u3001\u7403\u4f53\u3001\u6321\u677f\u3001\u7816\u5757\u98ce\u683c\u5feb\u901f\u9884\u89c8",
         u8"\u8857\u673a\u7834\u9635",
         u8"\u5546\u4e1a\u5316\u8857\u673a\u539f\u578b",
         u8"\u9ad8\u4fdd\u771f\u78b0\u649e\u3001\u8fde\u7eed\u95ef\u5173\u548c\u957f\u671f\u6210\u957f\uff0c\u5168\u90e8\u6536\u675f\u5230\u540c\u4e00\u5c40\u4f53\u9a8c",
-        u8"\u6309 Enter \u7acb\u5373\u5f00\u5c40\uff0c\u7ee7\u7eed\u4f60\u7684\u4e0b\u4e00\u8f6e\u63a8\u8fdb",
+        u8"\u6309\u56de\u8f66\u952e\u7acb\u5373\u5f00\u5c40\uff0c\u7ee7\u7eed\u4f60\u7684\u4e0b\u4e00\u8f6e\u63a8\u8fdb",
         u8"\u672c\u8f6e\u5165\u53e3",
         u8"\u649e\u7a7f\u7816\u9635\u3001\u7d2f\u79ef\u8f6f\u8d27\u5e01\u3001\u6301\u7eed\u5237\u65b0\u6700\u4f73\u6210\u7ee9",
         u8"\u73a9\u5bb6\u6863\u6848",
@@ -105,16 +105,16 @@ std::vector<int> buildUiFontCodepoints()
         u8"\u7403\u4f53\u989c\u8272",
         u8"\u6321\u677f\u989c\u8272",
         u8"\u7816\u5757\u989c\u8272",
-        u8"\u6309 L \u6f14\u793a\u5f02\u6b65\u52a0\u8f7d\uff0c\u5f55\u5c4f\u65f6\u53ef\u76f4\u63a5\u5c55\u793a\u4e0d\u5361\u987f\u7684 Loading \u52a8\u753b",
+        u8"\u6309\u52a0\u8f7d\u952e\u6f14\u793a\u5f02\u6b65\u52a0\u8f7d\uff0c\u5f55\u5c4f\u65f6\u53ef\u76f4\u63a5\u5c55\u793a\u4e0d\u5361\u987f\u7684\u52a0\u8f7d\u52a8\u753b",
         u8"\u5f02\u6b65\u52a0\u8f7d\u6f14\u793a",
         u8"\u540e\u53f0\u7ebf\u7a0b\u6b63\u5728\u51c6\u5907\u8d44\u6e90\uff0c\u4e3b\u7ebf\u7a0b\u7ee7\u7eed\u6e32\u67d3\uff0c\u4e0d\u4f1a\u5361\u4f4f\u754c\u9762",
         u8"\u52a0\u8f7d\u5b8c\u6210\uff0c\u7816\u5757\u4e3b\u9898\u5df2\u5237\u65b0",
-        u8"\u6309 L \u53ef\u518d\u6b21\u89e6\u53d1",
+        u8"\u6309\u52a0\u8f7d\u952e\u53ef\u518d\u6b21\u89e6\u53d1",
         u8"\u5f53\u524d\u8fdb\u5ea6",
         u8"\u8d44\u6e90\u70ed\u52a0\u8f7d",
         u8"\u52a0\u8f7d\u671f\u95f4\u4ecd\u53ef\u7ee7\u7eed\u6e32\u67d3\u548c\u64cd\u4f5c",
         u8"\u68c0\u6d4b\u5230\u4e0a\u6b21\u8fd0\u884c\u5b58\u6863",
-        u8"\u6309 C \u7ee7\u7eed\u4ece\u5b58\u6863\u5173\u5361\u5f00\u59cb \u6309 Enter \u6216 N \u65b0\u5f00\u4e00\u5c40",
+        u8"\u6309\u7ee7\u7eed\u952e\u4ece\u5b58\u6863\u5173\u5361\u5f00\u59cb \u6309\u56de\u8f66\u952e\u65b0\u5f00\u4e00\u5c40 \u91cd\u65b0\u5f00\u5c40",
         u8"\u7ee7\u7eed\u5b58\u6863",
         u8"\u65b0\u5f00\u4e00\u5c40",
         u8"\u7f16\u8f91\u6a21\u5f0f",
@@ -123,6 +123,13 @@ std::vector<int> buildUiFontCodepoints()
         u8"\u5173\u5361 JSON \u7f3a\u5931\u6216\u683c\u5f0f\u9519\u8bef \u5df2\u56de\u9000\u5230\u9ed8\u8ba4\u5e03\u5c40",
         u8"\u5b58\u6863\u5df2\u4ece\u65e7\u7248\u683c\u5f0f\u8fc1\u79fb\u5230\u65b0\u7248",
         u8"\u5b58\u6863\u635f\u574f\u6216\u8bfb\u53d6\u5931\u8d25 \u5df2\u5ffd\u7565",
+        u8"\u5f97\u5206 \u547d \u7403 \u8d2f \u8c03\u8bd5 \u664b\u7ea7\u6311\u6218 \u91d1\u5e01 \u91cd\u65b0\u5f00\u5c40 \u6311\u6218\u7ed3\u675f \u7ed3\u7b97\u603b\u5206 \u5168\u90e8\u901a\u5173",
+        u8"\u5b9e\u65f6\u589e\u76ca \u8d2f\u7a7f\u5f3a\u51fb \u5e38\u9a7b \u6e38\u620f\u6682\u505c \u52a0\u8f7d\u4e2d \u8fdb\u5ea6 \u4e3b\u9898 \u7403\u4f53 \u6321\u677f \u7816\u5757",
+        u8"\u8d77\u624b\u95e8 \u5bf9\u51b2\u6d41 \u87ba\u65cb\u57ce \u53cc\u7ffc\u5939\u51fb \u4e2d\u8def\u7206\u7834 \u7ec8\u5c40\u73af\u9635",
+        u8"\u5ce1\u8c37\u7a7f\u884c \u9636\u68af\u51b2\u523a \u8702\u5de2\u88c2\u53d8 \u53cc\u5854\u56f4\u653b \u98ce\u8f66\u56de\u65cb \u7ec8\u6781\u6d2a\u6d41",
+        u8"\u672c\u5173 \u5173\u5361\u7a81\u7834 \u4e0b\u4e00\u9635\u5217\u5df2\u5c55\u5f00 \u7b2c",
+        u8"\u723d\u5feb\u77ed\u5c40 \u7acb\u5373\u5f00\u6253 \u5f00\u5c40 \u5b58\u6863 \u672c\u8f6e\u51c6\u5907 \u7b2c\u4e00\u79d2\u5c31\u5f00\u59cb\u51b2\u51fb",
+        u8"\u8fde\u51fb \u500d\u7387",
     };
 
     for (const char* sample : zhSamples)
@@ -335,6 +342,7 @@ Game::Game(
 
     LoadPowerUpConfig();
     LoadPlayerProfile();
+    LoadGameplayArt();
     LoadBackgroundTextures();
     currentLevel = 1;
     LoadLevelForCurrentStage();
@@ -357,6 +365,7 @@ Game::~Game()
     JoinAsyncLoadThread();
     SaveRuntimeProgress();
     SavePlayerProfile();
+    UnloadGameplayArt();
     UnloadBackgroundTextures();
     if (hasUiFont && uiFont.texture.id != 0)
     {
@@ -465,6 +474,48 @@ void Game::ShowNotice(const char* zhText, const char* enText, float seconds)
     noticeTimer = std::max(seconds, 0.0F);
 }
 
+void Game::RegisterComboHit(bool destroyed)
+{
+    if (!destroyed)
+    {
+        comboTimer = std::max(comboTimer, 1.25F);
+        return;
+    }
+
+    ++comboCount;
+    comboTimer = std::clamp(2.6F + (float)comboCount * 0.030F, 2.6F, 4.2F);
+    comboPulseTimer = 0.32F;
+
+    if (comboCount >= 22)
+    {
+        comboMultiplier = 5;
+    }
+    else if (comboCount >= 14)
+    {
+        comboMultiplier = 4;
+    }
+    else if (comboCount >= 8)
+    {
+        comboMultiplier = 3;
+    }
+    else if (comboCount >= 3)
+    {
+        comboMultiplier = 2;
+    }
+    else
+    {
+        comboMultiplier = 1;
+    }
+}
+
+void Game::ResetCombo()
+{
+    comboCount = 0;
+    comboMultiplier = 1;
+    comboTimer = 0.0F;
+    comboPulseTimer = 0.0F;
+}
+
 void Game::StartNewRun()
 {
     currentState = GameState::PLAYING;
@@ -477,6 +528,10 @@ void Game::StartNewRun()
     edgeParticles.clear();
     particleSystem.clear();
     pendingPierceCharges = 0;
+    hitFlashTimer = 0.0F;
+    powerSurgeTimer = 0.0F;
+    ResetCombo();
+    lastObservedPowerUpCollections = playerProfile.totalPowerUpsCollected;
     ++playerProfile.totalRuns;
 
     ClearRuntimeSave();
@@ -507,6 +562,10 @@ bool Game::ContinueSavedRun()
     edgeParticles.clear();
     particleSystem.clear();
     pendingPierceCharges = 0;
+    hitFlashTimer = 0.0F;
+    powerSurgeTimer = 0.0F;
+    ResetCombo();
+    lastObservedPowerUpCollections = playerProfile.totalPowerUpsCollected;
 
     LoadLevelForCurrentStage();
     lives = std::max(1, resumeSaveState.lives);
@@ -571,11 +630,11 @@ void Game::HandleEditorInput()
     if (IsKeyPressed(KEY_SIX)) editorShape = 5;
     if (IsKeyPressed(KEY_LEFT_BRACKET))
     {
-        editorDurability = std::max(1, editorDurability - 1);
+        editorDurability = 1;
     }
     if (IsKeyPressed(KEY_RIGHT_BRACKET))
     {
-        editorDurability = std::min(5, editorDurability + 1);
+        editorDurability = 1;
     }
 
     const bool savePressed = IsKeyPressed(KEY_S)
@@ -618,7 +677,7 @@ void Game::HandleEditorInput()
             snappedRect.width,
             snappedRect.height,
             editorShape,
-            editorDurability);
+            1);
         brickPowerUps.push_back(std::nullopt);
         RebuildBrickSpatialGrid();
     }
@@ -642,7 +701,7 @@ void Game::SaveCurrentLevelLayout()
             rect.width,
             rect.height,
             brick.GetShape(),
-            brick.MaxHitPoints(),
+            1,
         });
     }
 
@@ -808,7 +867,7 @@ void Game::ApplyLevelData(const game::LevelData& levelData)
     world.paddle = effectPaddle.get();
 
     spawnBallPosition = levelData.ballStart;
-    spawnBallVelocity = Vector2 {levelData.ballSpeed.x * 60.0F, levelData.ballSpeed.y * 60.0F};
+    spawnBallVelocity = Vector2 {levelData.ballSpeed.x * 68.0F, levelData.ballSpeed.y * 68.0F};
     spawnBallRadius = std::clamp(levelData.ballRadius * 1.35F, 18.0F, 28.0F);
     paddleSpeedMultiplier = 1.0F;
 
@@ -859,7 +918,11 @@ void Game::LoadBackgroundTextures()
 {
     UnloadBackgroundTextures();
 
-    const std::vector<std::string> imagePaths = collectImagePaths("image");
+    std::vector<std::string> imagePaths = collectImagePaths("assets/art/backgrounds");
+    if (imagePaths.empty())
+    {
+        imagePaths = collectImagePaths("image");
+    }
     if (imagePaths.empty())
     {
         return;
@@ -924,8 +987,7 @@ void Game::LoadBackgroundTextures()
             return lhs.luminance > rhs.luminance;
         });
 
-    const std::size_t levelCount = game_style::levelConfigs().size();
-    auto loadPack = [levelCount](const std::vector<BackgroundCandidate>& candidates, BackgroundPack& pack)
+    auto loadPack = [](const std::vector<BackgroundCandidate>& candidates, BackgroundPack& pack)
     {
         if (candidates.empty())
         {
@@ -938,11 +1000,10 @@ void Game::LoadBackgroundTextures()
             pack.menu = menuTexture;
         }
 
-        pack.levels.reserve(levelCount);
-        for (std::size_t levelIndex = 0; levelIndex < levelCount; ++levelIndex)
+        pack.levels.reserve(candidates.size());
+        for (const BackgroundCandidate& candidate : candidates)
         {
-            const std::size_t pick = (levelIndex + 1) % candidates.size();
-            const Texture2D levelTexture = LoadTexture(candidates[pick].path.c_str());
+            const Texture2D levelTexture = LoadTexture(candidate.path.c_str());
             if (levelTexture.id != 0)
             {
                 pack.levels.push_back(levelTexture);
@@ -978,6 +1039,54 @@ void Game::UnloadBackgroundTextures()
     unloadPack(lightBackgrounds);
 }
 
+void Game::LoadGameplayArt()
+{
+    UnloadGameplayArt();
+
+    gameArt.ball = LoadTexture("assets/art/breakout/ball_blue.png");
+    gameArt.paddle = LoadTexture("assets/art/breakout/paddle_capsule.png");
+
+    const char* brickPaths[] {
+        "assets/art/breakout/brick_blue.png",
+        "assets/art/breakout/brick_green.png",
+        "assets/art/breakout/brick_purple.png",
+        "assets/art/breakout/brick_red.png",
+        "assets/art/breakout/brick_orange.png",
+        "assets/art/breakout/brick_cyan.png",
+        "assets/art/breakout/brick_yellow.png",
+        "assets/art/breakout/brick_deepgreen.png",
+        "assets/art/breakout/brick_steel.png",
+        "assets/art/breakout/brick_brown.png",
+    };
+
+    for (std::size_t index = 0; index < gameArt.bricks.size(); ++index)
+    {
+        gameArt.bricks[index] = LoadTexture(brickPaths[index]);
+    }
+}
+
+void Game::UnloadGameplayArt()
+{
+    if (gameArt.ball.id != 0)
+    {
+        UnloadTexture(gameArt.ball);
+        gameArt.ball = Texture2D {};
+    }
+    if (gameArt.paddle.id != 0)
+    {
+        UnloadTexture(gameArt.paddle);
+        gameArt.paddle = Texture2D {};
+    }
+    for (Texture2D& texture : gameArt.bricks)
+    {
+        if (texture.id != 0)
+        {
+            UnloadTexture(texture);
+            texture = Texture2D {};
+        }
+    }
+}
+
 const Texture2D* Game::ResolveCurrentBackground() const
 {
     const BackgroundPack& pack = isDarkMode ? darkBackgrounds : lightBackgrounds;
@@ -992,25 +1101,32 @@ const Texture2D* Game::ResolveCurrentBackground() const
     }
 
     const std::size_t levelIndex = (std::size_t)std::max(currentLevel - 1, 0);
-    const std::size_t pick = std::min(levelIndex, pack.levels.size() - 1);
+    const std::size_t pick = levelIndex % pack.levels.size();
     return &pack.levels[pick];
+}
+
+const Texture2D* Game::ResolveBrickTexture(std::size_t brickIndex) const
+{
+    if (gameArt.bricks.empty())
+    {
+        return nullptr;
+    }
+
+    const std::size_t textureIndex = (brickIndex + (std::size_t)std::max(currentLevel - 1, 0)) % gameArt.bricks.size();
+    const Texture2D& texture = gameArt.bricks[textureIndex];
+    return texture.id != 0 ? &texture : nullptr;
 }
 
 Game::MenuStyleButtonRects Game::MenuStyleButtons() const
 {
-    const Rectangle shell {60.0F, (float)screenHeight * 0.16F, (float)screenWidth - 120.0F, (float)screenHeight * 0.64F};
-    const Rectangle leftColumn {shell.x + 18.0F, shell.y + 18.0F, shell.width * 0.53F, shell.height - 36.0F};
-    const Rectangle rightColumn {
-        leftColumn.x + leftColumn.width + 18.0F,
-        shell.y + 18.0F,
-        shell.width - leftColumn.width - 36.0F,
-        shell.height - 36.0F,
-    };
+    const Rectangle shell {72.0F, (float)screenHeight * 0.19F, (float)screenWidth - 144.0F, (float)screenHeight * 0.56F};
+    const Rectangle hero {shell.x + 24.0F, shell.y + 24.0F, shell.width * 0.62F, shell.height - 48.0F};
+    const Rectangle side {hero.x + hero.width + 24.0F, shell.y + 24.0F, shell.width - hero.width - 72.0F, shell.height - 48.0F};
 
-    const Rectangle buttonArea {rightColumn.x + 18.0F, rightColumn.y + 338.0F, rightColumn.width - 36.0F, 118.0F};
-    const float gap = 14.0F;
+    const Rectangle buttonArea {side.x + 24.0F, side.y + side.height - 126.0F, side.width - 48.0F, 110.0F};
+    const float gap = 12.0F;
     const float buttonWidth = (buttonArea.width - gap) * 0.5F;
-    const float buttonHeight = 52.0F;
+    const float buttonHeight = 48.0F;
 
     return MenuStyleButtonRects {
         Rectangle {buttonArea.x, buttonArea.y, buttonWidth, buttonHeight},
@@ -1155,9 +1271,52 @@ void Game::Update()
     {
         noticeTimer = std::max(0.0F, noticeTimer - deltaSeconds);
     }
+    if (impactFreezeTimer > 0.0F)
+    {
+        impactFreezeTimer = std::max(0.0F, impactFreezeTimer - deltaSeconds);
+    }
+    if (screenShakeTimer > 0.0F)
+    {
+        screenShakeTimer = std::max(0.0F, screenShakeTimer - deltaSeconds);
+        if (screenShakeTimer <= 0.0F)
+        {
+            screenShakeMagnitude = 0.0F;
+        }
+    }
+    if (hitFlashTimer > 0.0F)
+    {
+        hitFlashTimer = std::max(0.0F, hitFlashTimer - deltaSeconds);
+    }
+    if (powerSurgeTimer > 0.0F)
+    {
+        powerSurgeTimer = std::max(0.0F, powerSurgeTimer - deltaSeconds);
+    }
+    if (comboTimer > 0.0F)
+    {
+        comboTimer = std::max(0.0F, comboTimer - deltaSeconds);
+        if (comboTimer <= 0.0F)
+        {
+            ResetCombo();
+        }
+    }
+    if (comboPulseTimer > 0.0F)
+    {
+        comboPulseTimer = std::max(0.0F, comboPulseTimer - deltaSeconds);
+    }
+    if (levelClearTimer > 0.0F)
+    {
+        levelClearTimer = std::max(0.0F, levelClearTimer - deltaSeconds);
+    }
 
     if (currentState != GameState::PLAYING || victory || editorModeActive)
     {
+        UpdateEdgeParticles();
+        return;
+    }
+
+    if (impactFreezeTimer > 0.0F)
+    {
+        particleSystem.update(deltaSeconds);
         UpdateEdgeParticles();
         return;
     }
@@ -1195,7 +1354,15 @@ void Game::Update()
     SyncEffectPaddleToGameplay();
     HandleBalls(paddleVelocity, deltaSeconds);
 
+    const int collectedBefore = playerProfile.totalPowerUpsCollected;
     powerUpSystem.update(deltaSeconds, world, (float)screenHeight);
+    if (playerProfile.totalPowerUpsCollected > collectedBefore || playerProfile.totalPowerUpsCollected > lastObservedPowerUpCollections)
+    {
+        powerSurgeTimer = 0.72F;
+        hitFlashTimer = std::max(hitFlashTimer, 0.18F);
+        TriggerImpact(0.028F, 8.0F);
+    }
+    lastObservedPowerUpCollections = playerProfile.totalPowerUpsCollected;
     particleSystem.update(deltaSeconds);
 
     ApplyEffectPaddleToGameplay();
