@@ -13,6 +13,9 @@ int main(int argc, char** argv)
 
     std::cout << u8"\u6e38\u620f\u5df2\u542f\u52a8\uff1a\u65b9\u5411\u952e\u79fb\u52a8\uff0c\u9000\u51fa\u952e\u7ed3\u675f\u3002\n";
 
+    // Command-line flags are intentionally small and demo-oriented. They let the
+    // route-show scripts start the game, capture frames, and exit after a target
+    // level without changing normal interactive play.
     bool autoStart = false;
     bool autoContinue = false;
     int demoExitLevel = 0;

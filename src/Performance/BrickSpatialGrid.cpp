@@ -13,6 +13,9 @@ void BrickSpatialGrid::rebuild(
 {
     clear();
 
+    // Clamp cell dimensions so malformed config values cannot create a zero
+    // size grid. Rectangles may span multiple cells, so each covered cell stores
+    // the same rectangle index for later broad-phase lookup.
     bounds_ = bounds;
     cellWidth_ = std::max(1.0F, cellWidth);
     cellHeight_ = std::max(1.0F, cellHeight);
@@ -63,6 +66,9 @@ void BrickSpatialGrid::queryCircle(const Vector2& center, float radius, std::vec
         return;
     }
 
+    // queryMarks_ avoids duplicate indices when the query circle overlaps
+    // several cells that reference the same rectangle. The stamp reset handles
+    // the rare uint32 wraparound case without reallocating per query.
     ++queryStamp_;
     if (queryStamp_ == 0U)
     {

@@ -7,5 +7,6 @@
 *.user
 *.suo
 *.pdb
+*.zip
 player_profile.json
 user_prefs.json

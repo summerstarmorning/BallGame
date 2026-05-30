@@ -66,6 +66,10 @@ game::Vec2 ClosestPointOnRect(const game::Vec2& point, const Rectangle& rect)
 
 game::Vec2 ResolveCircleRectNormal(const game::Ball& ball, const Rectangle& rect, float& penetration)
 {
+    // First use the closest point method, which is enough for the common case
+    // where the circle center is outside the rectangle. If the center is inside
+    // the rectangle, fall back to the nearest face so the ball can be pushed out
+    // along a stable normal instead of jittering between axes.
     const game::Vec2 closestPoint = ClosestPointOnRect(ball.position, rect);
     const game::Vec2 offset = ball.position - closestPoint;
     const float distanceSquared = LengthSquared(offset);
@@ -108,6 +112,9 @@ game::Vec2 ResolveCircleRectNormal(const game::Ball& ball, const Rectangle& rect
 
 void ConstrainBallTravelDirection(game::Ball& ball)
 {
+    // Very flat trajectories can create long boring rallies or near-deadlocks.
+    // Keep the total speed, but enforce a minimum vertical component so each
+    // rebound continues to make progress through the brick field.
     const float speedSquared = LengthSquared(ball.velocity);
     if (speedSquared <= kDirectionEpsilon)
     {
@@ -223,6 +230,8 @@ void Game::InitBricks()
 
 void Game::RebuildBrickSpatialGrid()
 {
+    // The grid is a broad-phase filter only. It returns possible brick indices;
+    // HandleBallBrickCollision still runs raylib's exact circle/rectangle check.
     brickCollisionRects.clear();
     brickCollisionRects.reserve(bricks.size());
     for (const Brick& brick : bricks)
@@ -530,6 +539,9 @@ void Game::HandleBallPaddleCollision(game::Ball& managedBall, const game::Vec2& 
         paddleVelocity.x * kPaddleHorizontalTransfer,
         paddleVelocity.y * kPaddleVerticalTransfer,
     };
+    // Reflect in the paddle's moving frame. This is the main "free control"
+    // upgrade: vertical and horizontal paddle motion inject a small amount of
+    // impulse into the rebound, rather than simply flipping the ball velocity.
     const game::Vec2 relativeVelocity = managedBall.velocity - effectivePaddleVelocity;
     const float normalVelocity = Dot(relativeVelocity, collisionNormal);
     if (normalVelocity >= 0.0F)
@@ -552,6 +564,8 @@ void Game::HandleBallBrickCollision(game::Ball& managedBall)
 
     if (!brickSpatialGrid.empty())
     {
+        // Broad phase: query only grid cells touched by the ball. This keeps
+        // collision cost stable when the level contains many decorative bricks.
         brickSpatialGrid.queryCircle(
             game_style::toRayVec(managedBall.position),
             managedBall.radius,
@@ -586,6 +600,9 @@ void Game::HandleBallBrickCollision(game::Ball& managedBall)
 
         if (!usePierceCharge)
         {
+            // Normal hits bounce once and mark the ball as resolved for this
+            // frame. Pierce hits intentionally skip the bounce and continue
+            // through additional bricks while consuming a limited charge count.
             float penetration = 0.0F;
             const game::Vec2 collisionNormal = ResolveCircleRectNormal(managedBall, brickRect, penetration);
             if (penetration > 0.0F)

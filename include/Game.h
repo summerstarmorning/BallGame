@@ -23,6 +23,19 @@
 #include "Save/RunSaveState.hpp"
 #include "raylib.h"
 
+/**
+ * @brief Main gameplay coordinator for the Breakout project.
+ *
+ * The class owns the high-level state machine, input handling, level data,
+ * runtime save data, visual assets, power-up systems, and frame-by-frame update
+ * flow. Lower-level systems such as BallManager, PowerUpSystem, LevelLoader,
+ * ParticleSystem, and BrickSpatialGrid remain separated so the project can be
+ * explained and extended module by module.
+ *
+ * Usage: construct after InitWindow(), call HandleInput(), Update(), and Draw()
+ * once per frame, and stop when ShouldClose() returns true. The destructor
+ * joins the async loading thread and releases raylib resources.
+ */
 class Game {
 private:
     static constexpr float WALL_THICKNESS = 5.0f;
@@ -166,6 +179,7 @@ private:
 
     void InitConfigAndBricks(const std::string& levelJsonFile);
     void InitBricks();
+    // Rebuilds the acceleration structure used before precise ball/brick checks.
     void RebuildBrickSpatialGrid();
     void ApplyLevelData(const game::LevelData& levelData);
     bool LoadLevelForCurrentStage();
@@ -221,11 +235,23 @@ private:
     const Texture2D* ResolveCurrentBackground() const;
     const Texture2D* ResolveBrickTexture(std::size_t brickIndex) const;
     MenuStyleButtonRects MenuStyleButtons() const;
+    // Async demo helpers: worker thread only prepares state; texture work stays on the render thread.
     void StartAsyncLoadDemo();
     void PollAsyncLoadDemo(float deltaSeconds);
     void JoinAsyncLoadThread();
 
 public:
+    /**
+     * @brief Create a game session and load all required gameplay resources.
+     *
+     * @param width Window width in pixels.
+     * @param height Window height in pixels.
+     * @param autoStart Start a new run immediately, useful for route-show demos.
+     * @param autoContinue Continue a saved run if one exists.
+     * @param autoExitLevel Optional demo stop level; zero disables auto-exit.
+     * @param autoExitHoldSeconds Seconds to hold after reaching the demo stop level.
+     * @param frameCaptureDir Optional folder for frame screenshots used by GIF/video scripts.
+     */
     Game(
         int width,
         int height,
@@ -235,8 +261,12 @@ public:
         float autoExitHoldSeconds = 0.0F,
         std::string frameCaptureDir = {});
     ~Game();
+    /// Returns true when the player requests exit or the OS window is closing.
     bool ShouldClose() const;
+    /// Reads keyboard/mouse input and mutates only high-level intent/state.
     void HandleInput();
+    /// Advances gameplay, timers, effects, save cadence, and async-load polling by one frame.
     void Update();
+    /// Draws the complete frame: background, gameplay, HUD, menus, overlays, and optional screenshots.
     void Draw();
 };
